@@ -1,0 +1,1 @@
+ALTER TABLE "customers" ADD COLUMN "reminder_enabled" boolean DEFAULT true NOT NULL;

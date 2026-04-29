@@ -1,0 +1,23 @@
+# Local PostgreSQL for development. Matches default backend DATABASE_URL.
+# From repo root: docker compose up -d
+# Then: cd backend && npm run db:migrate
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: udhar_diary
+    ports:
+      - "5432:5432"
+    volumes:
+      - udhar_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d udhar_diary"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  udhar_pgdata:
