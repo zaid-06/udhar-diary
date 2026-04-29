@@ -1,8 +1,8 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatInr } from "@/lib/format-currency";
-import { formatDateTime } from "@/lib/format-date-time";
+import { formatInr } from "@/shared/lib/format-currency";
+import { formatDateTime } from "@/shared/lib/format-date-time";
 import { type EntityConfig } from "@/components/entity/types";
 import {
   createStaff,
@@ -72,7 +72,7 @@ export const staffConfig: EntityConfig<StaffMember, StaffDetails> = {
   },
   details: {
     title: (item) => item.name,
-    subtitle: (item) => `${item.role} • ${item.mobile}`,
+    subtitle: (item) => `${item.role} â€¢ ${item.mobile}`,
     loadDetails: async (item) => ({ salaryLogs: await fetchStaffSalaryLogs(item.id) }),
     renderSummary: (item) => (
       <div className="grid grid-cols-2 gap-3 text-sm">
@@ -104,3 +104,4 @@ export const staffConfig: EntityConfig<StaffMember, StaffDetails> = {
     renderEntry: (item, _, { reload }) => <StaffEntrySection item={item} reload={reload} />,
   },
 };
+

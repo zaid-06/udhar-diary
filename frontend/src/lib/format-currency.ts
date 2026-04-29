@@ -1,4 +1,4 @@
-/** Format number as Indian Rupees for display. */
+﻿/** Format number as Indian Rupees for display. */
 export function formatInr(amount: number): string {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -7,3 +7,4 @@ export function formatInr(amount: number): string {
     maximumFractionDigits: 2,
   }).format(amount);
 }
+

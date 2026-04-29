@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Header } from "@/layout/Header";
 import type { AppLayoutContext } from "@/layout/AppLayout";
-import { EntityToolbar } from "@/modules/shared/components/EntityToolbar";
+import { EntityToolbar } from "./EntityToolbar";
 import { EntityFormModal } from "./EntityFormModal";
 import { EntityTable } from "./EntityTable";
 import { EntityDetailsModal } from "./EntityDetailsModal";
@@ -78,7 +78,7 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
           <CardDescription>{config.subtitle}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <EntityTable rows={filteredRows} columns={config.columns} onRowClick={openDetails} />
+          <EntityTable rows={filteredRows} columns={config.columns} onRowClick={openDetails} onReload={loadList} />
         </CardContent>
       </Card>
 
@@ -115,3 +115,4 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
     </div>
   );
 }
+

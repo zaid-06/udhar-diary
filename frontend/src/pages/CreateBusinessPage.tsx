@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { categoriesQueryKey } from "@/hooks/useCategories";
-import { createCategory, type BusinessType } from "@/services/categories.service";
-import { getErrorMessage } from "@/lib/get-error-message";
+import { categoriesQueryKey } from "@/modules/categories/hooks/useCategories";
+import { createCategory, type BusinessType } from "@/modules/categories/api/categories.api";
+import { getErrorMessage } from "@/shared/lib/get-error-message";
 
 const businessTypes: { value: BusinessType; label: string }[] = [
   { value: "shop", label: "Shop" },
@@ -115,3 +115,4 @@ export function CreateBusinessPage() {
     </div>
   );
 }
+

@@ -1,10 +1,10 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Moon, Plus, Sun, UserCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { type ThemeMode } from "@/lib/theme";
-import { type Category } from "@/services/categories.service";
+import { type ThemeMode } from "@/shared/lib/theme";
+import { type Category } from "@/modules/categories/api/categories.api";
 
 type ProfileMenuProps = {
   collapsed?: boolean;
@@ -120,3 +120,5 @@ export function ProfileMenu({
     </>
   );
 }
+
+

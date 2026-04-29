@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 import { fetchCustomerItems } from "@/services/items.service";
 
 export const customerItemsQueryKey = (customerId: number) =>
@@ -11,3 +11,4 @@ export function useCustomerItems(customerId: number | null, enabled = true) {
     enabled: enabled && customerId !== null,
   });
 }
+

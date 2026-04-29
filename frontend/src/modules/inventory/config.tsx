@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { formatInr } from "@/lib/format-currency";
+﻿import { Button } from "@/components/ui/button";
+import { formatInr } from "@/shared/lib/format-currency";
 import { type EntityConfig } from "@/components/entity/types";
 import { createInventory, deleteInventory, fetchInventory, type InventoryItem } from "./api";
 
@@ -76,3 +76,4 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
     ),
   },
 };
+

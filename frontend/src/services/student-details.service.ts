@@ -1,4 +1,4 @@
-import { api } from "./api";
+﻿import { api } from "./api";
 
 export type StudentDetails = {
   id: number;
@@ -16,3 +16,4 @@ export async function fetchStudentDetails(partyId: number): Promise<StudentDetai
     return null;
   }
 }
+

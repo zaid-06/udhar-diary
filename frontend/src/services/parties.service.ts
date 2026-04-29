@@ -1,4 +1,4 @@
-import { api } from "./api";
+﻿import { api } from "./api";
 
 export type PartyType = "customer" | "student" | "member";
 
@@ -43,3 +43,4 @@ export async function togglePartyReminder(partyId: number): Promise<TogglePartyR
   const { data } = await api.patch<TogglePartyReminderResponse>(`/v1/parties/${partyId}/reminder`);
   return data;
 }
+

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 import { fetchCustomers } from "@/services/customers.service";
 
 export const customersQueryKey = ["customers"] as const;
@@ -10,3 +10,4 @@ export function useCustomers(categoryId: number | null, enabled = true) {
     enabled: enabled && categoryId !== null,
   });
 }
+

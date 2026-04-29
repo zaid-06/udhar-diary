@@ -1,4 +1,4 @@
-import { api } from "@/services/api";
+﻿import { api } from "@/services/api";
 
 export type InventoryItem = {
   id: number;
@@ -33,3 +33,4 @@ export const updateInventory = async (
 export const deleteInventory = async (id: number) => {
   await api.delete(`/v1/inventory/${id}`);
 };
+

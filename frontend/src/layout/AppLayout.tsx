@@ -7,11 +7,11 @@ import { Sidebar } from "@/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import { BusinessModal } from "@/components/dashboard/BusinessModal";
 import { BusinessDetailsDialog } from "@/components/dashboard/BusinessDetailsDialog";
-import { useAuth } from "@/hooks/useAuth";
-import { categoriesQueryKey, useCategories } from "@/hooks/useCategories";
-import { createCategory, deleteCategory, updateCategory, type Category } from "@/services/categories.service";
-import { getErrorMessage } from "@/lib/get-error-message";
-import { getInitialTheme, setThemePreference, type ThemeMode } from "@/lib/theme";
+import { useAuth } from "@/shared/auth/useAuth";
+import { categoriesQueryKey, useCategories } from "@/modules/categories/hooks/useCategories";
+import { createCategory, deleteCategory, updateCategory, type Category } from "@/modules/categories/api/categories.api";
+import { getErrorMessage } from "@/shared/lib/get-error-message";
+import { getInitialTheme, setThemePreference, type ThemeMode } from "@/shared/lib/theme";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "dashboardSidebarCollapsed";
 
@@ -228,3 +228,4 @@ export function AppLayout() {
     </div>
   );
 }
+

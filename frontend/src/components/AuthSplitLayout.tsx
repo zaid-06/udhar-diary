@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import { BadgeCheck, Building2, Wallet } from "lucide-react";
 
 type AuthSplitLayoutProps = {
@@ -57,3 +57,4 @@ export function AuthSplitLayout({ heading, tagline, description, children }: Aut
     </div>
   );
 }
+

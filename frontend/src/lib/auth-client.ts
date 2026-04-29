@@ -1,9 +1,9 @@
-import { createAuthClient } from "better-auth/react";
+﻿import { createAuthClient } from "better-auth/react";
 
 const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
 /**
- * Better Auth browser client — calls `/api/auth/*` on the API with cookies (`credentials: "include"`).
+ * Better Auth browser client â€” calls `/api/auth/*` on the API with cookies (`credentials: "include"`).
  */
 export const authClient = createAuthClient({
   baseURL,
@@ -11,3 +11,4 @@ export const authClient = createAuthClient({
     refetchOnWindowFocus: true,
   },
 });
+

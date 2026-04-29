@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Bell, BellOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatInr } from "@/lib/format-currency";
-import { formatDateTime } from "@/lib/format-date-time";
+import { formatInr } from "@/shared/lib/format-currency";
+import { formatDateTime } from "@/shared/lib/format-date-time";
 import { type EntityConfig } from "@/components/entity/types";
-import { fetchCustomers, settleCustomerPayment, type Customer } from "./api";
+import { fetchCustomers, settleCustomerPayment, toggleCustomerReminder, type Customer } from "./api";
 import { createParty } from "@/services/parties.service";
 import { createTransaction, fetchTransactionsByParty, type Transaction } from "@/services/transactions.service";
 
@@ -23,7 +24,7 @@ function CustomerEntrySection({
   const [title, setTitle] = useState("");
 
   return (
-    <div className="space-y-2">
+    <div className="-mt-1 space-y-2">
       <p className="text-sm font-semibold">Add Entry</p>
       <Input placeholder="Title (item/fees)" value={title} onChange={(e) => setTitle(e.target.value)} />
       <div className="flex gap-2">
@@ -64,6 +65,29 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
       className: "pr-6 text-right",
       render: (item) => formatInr(Number(item.totalAmount)),
     },
+    {
+      key: "reminderEnabled",
+      label: "Reminder",
+      className: "pr-6 text-right",
+      render: (item, { reload }) => (
+        <button
+          type="button"
+          className="ml-auto inline-flex items-center justify-center rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label={item.reminderEnabled ? "Turn reminder off" : "Turn reminder on"}
+          onClick={async (event) => {
+            event.stopPropagation();
+            await toggleCustomerReminder(item.id);
+            await reload();
+          }}
+        >
+          {item.reminderEnabled ? (
+            <Bell className="size-4 text-emerald-600" aria-hidden />
+          ) : (
+            <BellOff className="size-4" aria-hidden />
+          )}
+        </button>
+      ),
+    },
   ],
   formFields: [
     { name: "name", label: "Name", type: "text" },
@@ -83,13 +107,21 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
     });
   },
   details: {
-    title: (item) => item.name,
-    subtitle: (item) => item.mobileNumber,
+    title: () => "Customer Details",
+    logsPosition: "bottom",
     loadDetails: async (item) => ({
       transactions: await fetchTransactionsByParty(item.id),
     }),
     renderSummary: (item) => (
-      <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p className="text-xs text-muted-foreground">Name</p>
+          <p className="font-medium">{item.name}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Mobile</p>
+          <p className="font-medium">{item.mobileNumber}</p>
+        </div>
         <div>
           <p className="text-xs text-muted-foreground">Outstanding</p>
           <p className="font-semibold">{formatInr(Number(item.totalAmount))}</p>
@@ -101,7 +133,7 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
       </div>
     ),
     renderLogs: (_, details) => (
-      <div className="space-y-2">
+      <div className="-mt-1 space-y-2">
         <p className="text-sm font-semibold">Transactions</p>
         {!details?.transactions.length ? (
           <p className="text-sm text-muted-foreground">No transactions.</p>
@@ -140,3 +172,4 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
     ),
   },
 };
+

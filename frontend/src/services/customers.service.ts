@@ -1,4 +1,4 @@
-import { fetchPartiesByCategory, togglePartyReminder, type Party } from "./parties.service";
+﻿import { fetchPartiesByCategory, togglePartyReminder, type Party } from "./parties.service";
 import { createPaymentTransaction } from "./transactions.service";
 
 export type Customer = {
@@ -58,3 +58,4 @@ export type ToggleReminderResponse = {
 export async function toggleCustomerReminder(customerId: number): Promise<ToggleReminderResponse> {
   return togglePartyReminder(customerId);
 }
+

@@ -1,4 +1,4 @@
-import { api } from "@/services/api";
+﻿import { api } from "@/services/api";
 
 export type BusinessType = "shop" | "institute" | "gym";
 
@@ -46,3 +46,4 @@ export const updateCategory = async (
 export const deleteCategory = async (categoryId: number): Promise<void> => {
   await api.delete(`/v1/categories/${categoryId}`);
 };
+

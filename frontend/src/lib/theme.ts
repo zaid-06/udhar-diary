@@ -1,4 +1,4 @@
-export type ThemeMode = "light" | "dark";
+﻿export type ThemeMode = "light" | "dark";
 
 const THEME_KEY = "theme";
 
@@ -30,3 +30,4 @@ export const initializeTheme = (): ThemeMode => {
   applyTheme(initial);
   return initial;
 };
+

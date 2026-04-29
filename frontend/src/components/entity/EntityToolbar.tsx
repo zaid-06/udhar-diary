@@ -1,4 +1,4 @@
-import { SearchBar } from "@/components/SearchBar";
+﻿import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
 
 type EntityToolbarProps = {
@@ -23,3 +23,4 @@ export function EntityToolbar({
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+﻿import { Input } from "@/components/ui/input";
 
 type SearchBarProps = {
   value: string;
@@ -15,3 +15,4 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
     />
   );
 }
+

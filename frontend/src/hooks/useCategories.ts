@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 import { fetchCategories } from "@/services/categories.service";
 
 export const categoriesQueryKey = ["categories"];
@@ -9,3 +9,4 @@ export const useCategories = (enabled: boolean) =>
     queryFn: fetchCategories,
     enabled,
   });
+

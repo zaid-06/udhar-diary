@@ -1,4 +1,4 @@
-import { api } from "./api";
+﻿import { api } from "./api";
 
 export type CreateTransactionInput = {
   partyId: number;
@@ -30,3 +30,4 @@ export async function createPaymentTransaction(partyId: number, amount: number) 
   const { data } = await api.post("/v1/transactions/payment", { partyId, amount });
   return data;
 }
+

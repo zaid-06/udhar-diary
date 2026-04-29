@@ -1,4 +1,4 @@
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+﻿import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type ToggleButtonProps = {
@@ -24,3 +24,4 @@ export function ToggleButton({ collapsed, onToggle }: ToggleButtonProps) {
     </Button>
   );
 }
+

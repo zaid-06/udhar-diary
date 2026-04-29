@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/shared/auth/useAuth";
 
 type Props = { children: ReactNode };
 
@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: Props) {
   if (isLoading) {
     return (
       <div className="flex min-h-svh items-center justify-center p-4 text-muted-foreground">
-        Loading…
+        Loading...
       </div>
     );
   }
@@ -22,3 +22,4 @@ export function ProtectedRoute({ children }: Props) {
 
   return <>{children}</>;
 }
+

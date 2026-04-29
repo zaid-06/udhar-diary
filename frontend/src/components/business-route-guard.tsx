@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useCategories } from "@/hooks/useCategories";
+import { useAuth } from "@/shared/auth/useAuth";
+import { useCategories } from "@/modules/categories/hooks/useCategories";
 
 type Props = {
   children: ReactNode;
@@ -16,7 +16,7 @@ export function BusinessRouteGuard({ children, requireBusiness = true }: Props) 
   if (isLoading || isPending) {
     return (
       <div className="flex min-h-svh items-center justify-center p-4 text-muted-foreground">
-        Loading…
+        Loading...
       </div>
     );
   }
@@ -37,3 +37,4 @@ export function BusinessRouteGuard({ children, requireBusiness = true }: Props) 
 
   return <>{children}</>;
 }
+

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useCategories } from "@/hooks/useCategories";
-import { useAuth } from "@/hooks/useAuth";
+import { useCategories } from "@/modules/categories/hooks/useCategories";
+import { useAuth } from "@/shared/auth/useAuth";
 import { AppLayout } from "@/layout/AppLayout";
 
 const CustomersPage = lazy(() => import("@/modules/customers/pages/CustomersPage"));
@@ -40,3 +40,4 @@ export function BusinessRoutes() {
     </Suspense>
   );
 }
+

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Dumbbell, GraduationCap, LayoutDashboard, MoreHorizontal, Search, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { type ThemeMode } from "@/lib/theme";
-import { type Category } from "@/services/categories.service";
+import { type ThemeMode } from "@/shared/lib/theme";
+import { type Category } from "@/modules/categories/api/categories.api";
 import { ProfileMenu } from "./ProfileMenu";
 import { ToggleButton } from "./ToggleButton";
 
@@ -217,3 +217,5 @@ export function Sidebar({
     </>
   );
 }
+
+

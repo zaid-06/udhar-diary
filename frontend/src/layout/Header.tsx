@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { BusinessSwitcher } from "@/components/dashboard/BusinessSwitcher";
-import { type Category } from "@/services/categories.service";
+import { type Category } from "@/modules/categories/api/categories.api";
 
 type ModuleKey = "customers" | "inventory" | "suppliers" | "staff";
 
@@ -62,3 +62,4 @@ export function Header({
     </div>
   );
 }
+

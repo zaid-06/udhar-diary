@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { EntityPage } from "@/components/entity/EntityPage";
 import { customerConfig } from "../config";
@@ -13,3 +13,4 @@ export default function CustomersPage() {
 
   return <EntityPage config={customerConfig} />;
 }
+

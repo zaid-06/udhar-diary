@@ -1,4 +1,4 @@
-import { api } from "./api";
+﻿import { api } from "./api";
 
 export type CustomerItem = {
   id: number;
@@ -38,3 +38,4 @@ export async function addItemToCustomer(input: AddItemInput): Promise<CustomerIt
     itemName: data.itemName ?? data.name,
   };
 }
+

@@ -1,8 +1,8 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatInr } from "@/lib/format-currency";
-import { formatDateTime } from "@/lib/format-date-time";
+import { formatInr } from "@/shared/lib/format-currency";
+import { formatDateTime } from "@/shared/lib/format-date-time";
 import { type EntityConfig } from "@/components/entity/types";
 import {
   createSupplier,
@@ -116,3 +116,4 @@ export const suppliersConfig: EntityConfig<Supplier, SupplierDetails> = {
     renderEntry: (item, _, { reload }) => <SupplierEntrySection item={item} reload={reload} />,
   },
 };
+

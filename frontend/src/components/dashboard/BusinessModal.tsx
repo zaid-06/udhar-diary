@@ -1,9 +1,9 @@
-import { type FormEvent, useEffect, useState } from "react";
+﻿import { type FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type BusinessType } from "@/services/categories.service";
+import { type BusinessType } from "@/modules/categories/api/categories.api";
 
 type BusinessModalProps = {
   open: boolean;
@@ -85,3 +85,5 @@ export function BusinessModal({ open, isSubmitting, onOpenChange, onSubmit }: Bu
     </Dialog>
   );
 }
+
+

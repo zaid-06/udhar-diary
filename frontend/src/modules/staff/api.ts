@@ -1,4 +1,4 @@
-import { api } from "@/services/api";
+﻿import { api } from "@/services/api";
 
 export type StaffMember = {
   id: number;
@@ -43,3 +43,4 @@ export const fetchStaffSalaryLogs = async (staffId: number) => {
   const { data } = await api.get<StaffSalaryLog[]>(`/v1/staff/${staffId}/salary-logs`);
   return data;
 };
+

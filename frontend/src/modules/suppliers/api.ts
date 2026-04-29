@@ -1,4 +1,4 @@
-import { api } from "@/services/api";
+﻿import { api } from "@/services/api";
 
 export type Supplier = {
   id: number;
@@ -45,3 +45,4 @@ export const fetchSupplierTransactions = async (supplierId: number) => {
   const { data } = await api.get<SupplierTransaction[]>(`/v1/suppliers/${supplierId}/transactions`);
   return data;
 };
+

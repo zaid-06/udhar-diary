@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/useAuth";
-import { getErrorMessage } from "@/lib/get-error-message";
+import { useAuth } from "@/shared/auth/useAuth";
+import { getErrorMessage } from "@/shared/lib/get-error-message";
 
 export function RegisterPage() {
   const { user, isLoading, register } = useAuth();
@@ -21,7 +21,7 @@ export function RegisterPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-svh items-center justify-center text-muted-foreground">Loading…</div>
+      <div className="flex min-h-svh items-center justify-center text-muted-foreground">Loading...</div>
     );
   }
 
@@ -106,7 +106,7 @@ export function RegisterPage() {
                 className="w-full bg-gradient-to-r from-sky-600 via-blue-700 to-cyan-600 text-white hover:from-sky-500 hover:via-blue-600 hover:to-cyan-500 dark:from-slate-900 dark:via-slate-800 dark:to-blue-950 dark:hover:from-slate-800 dark:hover:via-slate-700 dark:hover:to-blue-900"
                 disabled={submitting || isLoading}
               >
-                {submitting ? "Creating account…" : "Register"}
+                {submitting ? "Creating account..." : "Register"}
               </Button>
               <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
@@ -121,3 +121,4 @@ export function RegisterPage() {
     </AuthSplitLayout>
   );
 }
+

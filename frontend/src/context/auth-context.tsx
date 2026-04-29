@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, type ReactNode } from "react";
+﻿import { createContext, useCallback, useMemo, type ReactNode } from "react";
 import { authClient } from "@/lib/auth-client";
 
 export type SessionUser = {
@@ -92,3 +92,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+

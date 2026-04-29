@@ -1,7 +1,7 @@
-import { Bell, BellOff, Loader2 } from "lucide-react";
+﻿import { Bell, BellOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 type ReminderToggleProps = {
   enabled: boolean;
@@ -40,3 +40,4 @@ export function ReminderToggle({
     </Tooltip>
   );
 }
+

@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { type Category } from "@/services/categories.service";
+import { type Category } from "@/modules/categories/api/categories.api";
 
 export type EntityModuleKey = "customers" | "inventory" | "suppliers" | "staff";
 
@@ -14,7 +14,7 @@ export type EntityColumnConfig<TItem> = {
   key: string;
   label: string;
   className?: string;
-  render?: (item: TItem) => ReactNode;
+  render?: (item: TItem, actions: { reload: () => Promise<void> }) => ReactNode;
 };
 
 export type EntityPageContext = {
@@ -26,6 +26,7 @@ export type EntityDetailsConfig<TItem, TDetails> = {
   title: (item: TItem) => string;
   subtitle?: (item: TItem) => string;
   loadDetails?: (item: TItem) => Promise<TDetails | null>;
+  logsPosition?: "middle" | "bottom";
   renderSummary: (item: TItem, details: TDetails | null) => ReactNode;
   renderLogs?: (item: TItem, details: TDetails | null) => ReactNode;
   renderEntry?: (
@@ -53,3 +54,5 @@ export type EntityConfig<TItem, TDetails = unknown> = {
   create: (ctx: EntityPageContext, values: Record<string, string>) => Promise<void>;
   details: EntityDetailsConfig<TItem, TDetails>;
 };
+
+

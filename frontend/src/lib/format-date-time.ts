@@ -1,4 +1,4 @@
-export function formatDateTime(value: string | Date): string {
+﻿export function formatDateTime(value: string | Date): string {
   const date = value instanceof Date ? value : new Date(value);
 
   return date.toLocaleString("en-IN", {
@@ -9,3 +9,4 @@ export function formatDateTime(value: string | Date): string {
     minute: "2-digit",
   });
 }
+

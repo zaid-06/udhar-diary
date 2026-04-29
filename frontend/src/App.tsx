@@ -1,6 +1,6 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import { BusinessRouteGuard } from "@/components/business-route-guard";
-import { ProtectedRoute } from "@/components/protected-route";
+﻿import { Navigate, Route, Routes } from "react-router-dom";
+import { BusinessRouteGuard } from "@/shared/guards/BusinessRouteGuard";
+import { ProtectedRoute } from "@/shared/guards/ProtectedRoute";
 import { CreateBusinessPage } from "@/pages/CreateBusinessPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
@@ -34,3 +34,4 @@ export default function App() {
     </Routes>
   );
 }
+

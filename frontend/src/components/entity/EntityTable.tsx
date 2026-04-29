@@ -5,9 +5,10 @@ type EntityTableProps<TItem> = {
   rows: TItem[];
   columns: EntityColumnConfig<TItem>[];
   onRowClick: (item: TItem) => void;
+  onReload: () => Promise<void>;
 };
 
-export function EntityTable<TItem>({ rows, columns, onRowClick }: EntityTableProps<TItem>) {
+export function EntityTable<TItem>({ rows, columns, onRowClick, onReload }: EntityTableProps<TItem>) {
   return (
     <Table>
       <TableHeader>
@@ -24,7 +25,9 @@ export function EntityTable<TItem>({ rows, columns, onRowClick }: EntityTablePro
           <TableRow key={index} className="cursor-pointer hover:bg-muted/60" onClick={() => onRowClick(row)}>
             {columns.map((column) => (
               <TableCell key={column.key} className={column.className}>
-                {column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? "")}
+                {column.render
+                  ? column.render(row, { reload: onReload })
+                  : String((row as Record<string, unknown>)[column.key] ?? "")}
               </TableCell>
             ))}
           </TableRow>
@@ -33,3 +36,4 @@ export function EntityTable<TItem>({ rows, columns, onRowClick }: EntityTablePro
     </Table>
   );
 }
+
