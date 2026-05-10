@@ -33,6 +33,7 @@ function SupplierEntrySection({
         <Button
           variant="outline"
           onClick={async () => {
+            if (Number(amount || 0) <= 0) return;
             await createSupplierTransaction(item.id, { amount: Number(amount || 0), type: "taken" });
             setAmount("");
             await reload();
@@ -43,6 +44,7 @@ function SupplierEntrySection({
         <Button
           variant="outline"
           onClick={async () => {
+            if (Number(amount || 0) <= 0) return;
             await createSupplierTransaction(item.id, { amount: Number(amount || 0), type: "given" });
             setAmount("");
             await reload();
@@ -93,7 +95,7 @@ export const suppliersConfig: EntityConfig<Supplier, SupplierDetails> = {
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Address</p>
-          <p className="font-medium">{item.address}</p>
+          <p className="font-medium">{item.address || "-"}</p>
         </div>
       </div>
     ),

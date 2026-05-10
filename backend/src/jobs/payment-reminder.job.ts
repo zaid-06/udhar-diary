@@ -1,25 +1,25 @@
 import { and, eq, gt, sql } from "drizzle-orm";
 import { db } from "../db/client.js";
-import { parties } from "../db/schema.js";
+import { entities } from "../db/schema.js";
 import { type ReminderChannel } from "../services/reminder/index.js";
 
-const fetchAllPartiesWithTotals = async () => {
+const fetchAllEntitiesWithTotals = async () => {
   return db
     .select({
-      id: parties.id,
-      name: parties.name,
-      mobileNumber: parties.mobile,
-      totalAmount: sql<number>`${parties.totalAmount}::float8`,
+      id: entities.id,
+      name: entities.name,
+      mobileNumber: entities.mobile,
+      totalAmount: sql<number>`${entities.totalAmount}::float8`,
     })
-    .from(parties)
-    .where(and(eq(parties.reminderEnabled, true), gt(parties.totalAmount, "0")));
+    .from(entities)
+    .where(and(eq(entities.reminderEnabled, true), gt(entities.totalAmount, "0")));
 };
 
 /**
- * Daily job: all parties with reminders enabled and pending total > 0.
+ * Daily job: all entities with reminders enabled and pending total > 0.
  */
 export const runPaymentReminderJob = async (sendReminder: ReminderChannel): Promise<void> => {
-  const rows = await fetchAllPartiesWithTotals();
+  const rows = await fetchAllEntitiesWithTotals();
 
   for (const row of rows) {
     await sendReminder({

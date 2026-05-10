@@ -1,6 +1,7 @@
 import { type NextFunction, type Request as ExpressRequest, type Response } from "express";
 import { auth } from "../auth/auth.config.js";
 import { env } from "../utils/env.js";
+import { sendError } from "../utils/api-response.js";
 
 const getForwardHeaders = (req: ExpressRequest): Headers => {
   const headers = new Headers();
@@ -60,7 +61,7 @@ export const attachAuthSession = async (
 
 export const requireAuth = (req: ExpressRequest, res: Response, next: NextFunction): void => {
   if (!req.auth?.user) {
-    res.status(401).json({ message: "Unauthorized" });
+    sendError(res, "Unauthorized", 401);
     return;
   }
 

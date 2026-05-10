@@ -1,8 +1,8 @@
-﻿import { fetchPartiesByCategory, togglePartyReminder, type Party } from "./parties.service";
+import { fetchPartiesByCategory, togglePartyReminder, type Party } from "./parties.service";
 import { createPaymentTransaction } from "./transactions.service";
 
 export type Customer = {
-  id: number;
+  id: string;
   name: string;
   mobileNumber: string;
   reminderEnabled: boolean;
@@ -19,25 +19,25 @@ const mapPartyToCustomer = (party: Party): Customer => ({
   totalAmount: party.totalAmount,
 });
 
-export async function fetchCustomers(categoryId: number): Promise<Customer[]> {
+export async function fetchCustomers(categoryId: string): Promise<Customer[]> {
   const parties = await fetchPartiesByCategory(categoryId);
   return parties.map(mapPartyToCustomer);
 }
 
-export async function settleCustomerPayment(customerId: number, totalAmount: number): Promise<void> {
+export async function settleCustomerPayment(customerId: string, totalAmount: number): Promise<void> {
   await createPaymentTransaction(customerId, totalAmount);
 }
 
 export type PayCustomerResponse = {
   message: string;
   customer: {
-    id: number;
+    id: string;
     totalAmount: number;
   };
 };
 
 export async function payCustomerAmount(
-  customerId: number,
+  customerId: string,
   amount: number,
 ): Promise<PayCustomerResponse> {
   await createPaymentTransaction(customerId, amount);
@@ -51,11 +51,11 @@ export async function payCustomerAmount(
 }
 
 export type ToggleReminderResponse = {
-  id: number;
+  id: string;
   reminderEnabled: boolean;
 };
 
-export async function toggleCustomerReminder(customerId: number): Promise<ToggleReminderResponse> {
+export async function toggleCustomerReminder(customerId: string): Promise<ToggleReminderResponse> {
   return togglePartyReminder(customerId);
 }
 

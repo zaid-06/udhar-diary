@@ -19,10 +19,10 @@ type AppModule = "customers" | "inventory" | "suppliers" | "staff";
 
 export type AppLayoutContext = {
   businesses: Category[];
-  activeBusinessId: number | null;
+  activeBusinessId: string | null;
   activeBusiness: Category | null;
   activeModule: AppModule;
-  onSwitchBusiness: (businessId: number) => void;
+  onSwitchBusiness: (businessId: string) => void;
   onOpenCreateBusiness: () => void;
 };
 
@@ -44,7 +44,7 @@ export function AppLayout() {
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
-  const activeBusinessId = Number.isFinite(Number(businessId)) ? Number(businessId) : null;
+  const activeBusinessId = businessId ?? null;
   const { data: businesses = [] } = useCategories(!!user);
   const activeBusiness = useMemo(
     () => businesses.find((business) => business.id === activeBusinessId) ?? null,
@@ -68,7 +68,7 @@ export function AppLayout() {
   });
 
   const updateBusinessMutation = useMutation({
-    mutationFn: ({ categoryId, payload }: { categoryId: number; payload: { name?: string; isActive?: boolean } }) =>
+    mutationFn: ({ categoryId, payload }: { categoryId: string; payload: { name?: string; isActive?: boolean } }) =>
       updateCategory(categoryId, payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: categoriesQueryKey });
@@ -89,7 +89,7 @@ export function AppLayout() {
     },
   });
 
-  const onSwitchBusiness = (nextBusinessId: number) => {
+  const onSwitchBusiness = (nextBusinessId: string) => {
     navigate(`/business/${nextBusinessId}/${activeModule}`);
     setSidebarOpen(false);
   };

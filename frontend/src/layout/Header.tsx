@@ -13,9 +13,9 @@ const MODULES: { key: ModuleKey; label: string }[] = [
 
 type HeaderProps = {
   businesses: Category[];
-  activeBusinessId: number | null;
+  activeBusinessId: string | null;
   activeModule: ModuleKey;
-  onSwitchBusiness: (businessId: number) => void;
+  onSwitchBusiness: (businessId: string) => void;
   onCreateBusiness: () => void;
 };
 

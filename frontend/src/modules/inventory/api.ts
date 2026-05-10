@@ -1,8 +1,14 @@
 ﻿import { api } from "@/services/api";
 
+type ApiEnvelope<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
+
 export type InventoryItem = {
-  id: number;
-  categoryId: number;
+  id: string;
+  categoryId: string;
   productName: string;
   quantity: number;
   unit: string;
@@ -12,25 +18,57 @@ export type InventoryItem = {
   lowStock: boolean;
 };
 
-export const fetchInventory = async (categoryId: number) => {
-  const { data } = await api.get<InventoryItem[]>("/v1/inventory", { params: { categoryId } });
-  return data;
+type InventoryApiItem = {
+  id: string;
+  businessId: string;
+  productName: string;
+  quantity: number;
+  unit: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  createdAt: string;
+};
+
+const mapInventory = (row: InventoryApiItem): InventoryItem => ({
+  id: row.id,
+  categoryId: row.businessId,
+  productName: row.productName,
+  quantity: row.quantity,
+  unit: row.unit,
+  purchasePrice: row.purchasePrice,
+  sellingPrice: row.sellingPrice,
+  createdAt: row.createdAt,
+  lowStock: row.quantity <= 5,
+});
+
+export const fetchInventory = async (categoryId: string) => {
+  const { data } = await api.get<ApiEnvelope<InventoryApiItem[]>>("/v1/inventory", {
+    params: { businessId: categoryId },
+  });
+  return data.data.map(mapInventory);
 };
 
 export const createInventory = async (payload: Omit<InventoryItem, "id" | "createdAt" | "lowStock">) => {
-  const { data } = await api.post<InventoryItem>("/v1/inventory", payload);
-  return data;
+  const { data } = await api.post<ApiEnvelope<InventoryApiItem>>("/v1/inventory", {
+    businessId: payload.categoryId,
+    productName: payload.productName,
+    quantity: payload.quantity,
+    unit: payload.unit,
+    purchasePrice: payload.purchasePrice,
+    sellingPrice: payload.sellingPrice,
+  });
+  return mapInventory(data.data);
 };
 
 export const updateInventory = async (
-  id: number,
+  id: string,
   payload: Partial<Pick<InventoryItem, "productName" | "quantity" | "unit" | "purchasePrice" | "sellingPrice">>,
 ) => {
-  const { data } = await api.patch<InventoryItem>(`/v1/inventory/${id}`, payload);
-  return data;
+  const { data } = await api.patch<ApiEnvelope<InventoryApiItem>>(`/v1/inventory/${id}`, payload);
+  return mapInventory(data.data);
 };
 
-export const deleteInventory = async (id: number) => {
+export const deleteInventory = async (id: string) => {
   await api.delete(`/v1/inventory/${id}`);
 };
 

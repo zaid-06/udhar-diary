@@ -1,14 +1,17 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  date,
   index,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
   serial,
   text,
   timestamp,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -18,131 +21,149 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const partyTypeEnum = pgEnum("party_type", ["customer", "student", "member"]);
 export const transactionTypeEnum = pgEnum("transaction_type", ["credit", "debit"]);
+export const transactionCategoryEnum = pgEnum("transaction_category", [
+  "item",
+  "fees",
+  "supply",
+  "salary",
+  "payment",
+  "membership",
+  "other",
+]);
 export const categoryTypeEnum = pgEnum("category_type", ["shop", "institute", "gym"]);
-export const supplierTransactionTypeEnum = pgEnum("supplier_transaction_type", ["given", "taken"]);
+export const entityCategoryEnum = pgEnum("entity_category", [
+  "customer",
+  "supplier",
+  "staff",
+  "student",
+  "member",
+  "teacher",
+  "trainer",
+]);
+export const staffRoleEnum = pgEnum("staff_role", ["teacher", "staff", "trainer"]);
 
-export const categories = pgTable(
-  "categories",
+export const businesses = pgTable(
+  "businesses",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     userId: integer("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    type: categoryTypeEnum("type").notNull(),
     name: text("name").notNull(),
+    type: categoryTypeEnum("type").notNull(),
     address: text("address").notNull(),
-    isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (table) => ({
-    userIdIdx: index("categories_user_id_idx").on(table.userId),
-    activeByUserIdx: index("categories_active_by_user_idx").on(table.userId, table.deletedAt),
+    userIdIdx: index("businesses_user_id_idx").on(table.userId),
+    activeByUserIdx: index("businesses_active_by_user_idx").on(table.userId, table.deletedAt),
   }),
 );
 
-export const parties = pgTable("parties", {
-  id: serial("id").primaryKey(),
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => categories.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  mobile: text("mobile").notNull(),
-  type: partyTypeEnum("type").notNull(),
-  totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).notNull().default("0"),
-  reminderEnabled: boolean("reminder_enabled").notNull().default(true),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const entities = pgTable(
+  "entities",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    businessId: uuid("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    mobile: text("mobile").notNull(),
+    address: text("address"),
+    category: entityCategoryEnum("category").notNull(),
+    totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).notNull().default("0"),
+    reminderEnabled: boolean("reminder_enabled").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    businessIdIdx: index("entities_business_id_idx").on(table.businessId),
+    categoryIdx: index("entities_category_idx").on(table.category),
+  }),
+);
 
-export const studentDetails = pgTable("student_details", {
-  id: serial("id").primaryKey(),
-  partyId: integer("party_id")
-    .notNull()
-    .unique()
-    .references(() => parties.id, { onDelete: "cascade" }),
+export const entityTransactions = pgTable(
+  "entity_transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    entityId: uuid("entity_id")
+      .notNull()
+      .references(() => entities.id, { onDelete: "cascade" }),
+    category: transactionCategoryEnum("category").notNull(),
+    title: text("title").notNull(),
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+    quantity: numeric("quantity", { precision: 12, scale: 2 }),
+    unit: text("unit"),
+    metadata: jsonb("metadata"),
+    type: transactionTypeEnum("type").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    entityIdIdx: index("entity_transactions_entity_id_idx").on(table.entityId),
+    createdAtIdx: index("entity_transactions_created_at_idx").on(table.createdAt),
+    categoryIdx: index("entity_transactions_category_idx").on(table.category),
+  }),
+);
+
+export const businessInventory = pgTable(
+  "business_inventory",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    businessId: uuid("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    productName: text("product_name").notNull(),
+    quantity: numeric("quantity", { precision: 12, scale: 2 }).notNull().default("0"),
+    unit: text("unit").notNull().default("pcs"),
+    purchasePrice: numeric("purchase_price", { precision: 12, scale: 2 }).notNull().default("0"),
+    sellingPrice: numeric("selling_price", { precision: 12, scale: 2 }).notNull().default("0"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    businessIdIdx: index("business_inventory_business_id_idx").on(table.businessId),
+  }),
+);
+
+export const supplierInventoryLinks = pgTable(
+  "supplier_inventory_links",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    supplierId: uuid("supplier_id")
+      .notNull()
+      .references(() => entities.id, { onDelete: "cascade" }),
+    inventoryId: uuid("inventory_id")
+      .notNull()
+      .references(() => businessInventory.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    supplierInventoryUnique: index("supplier_inventory_unique_idx").on(table.supplierId, table.inventoryId),
+  }),
+);
+
+export const entityStudentDetails = pgTable("entity_student_details", {
+  entityId: uuid("entity_id")
+    .primaryKey()
+    .references(() => entities.id, { onDelete: "cascade" }),
   class: text("class").notNull(),
   rollNumber: text("roll_number").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const transactions = pgTable("transactions", {
-  id: serial("id").primaryKey(),
-  partyId: integer("party_id")
-    .notNull()
-    .references(() => parties.id, { onDelete: "cascade" }),
-  type: transactionTypeEnum("type").notNull(),
-  title: text("title").notNull(),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-export const items = pgTable("items", {
-  id: serial("id").primaryKey(),
-  partyId: integer("party_id")
-    .notNull()
-    .references(() => parties.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-export const inventory = pgTable("inventory", {
-  id: serial("id").primaryKey(),
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => categories.id, { onDelete: "cascade" }),
-  productName: text("product_name").notNull(),
-  quantity: numeric("quantity", { precision: 12, scale: 2 }).notNull().default("0"),
-  unit: text("unit").notNull().default("pcs"),
-  purchasePrice: numeric("purchase_price", { precision: 12, scale: 2 }).notNull().default("0"),
-  sellingPrice: numeric("selling_price", { precision: 12, scale: 2 }).notNull().default("0"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-export const suppliers = pgTable("suppliers", {
-  id: serial("id").primaryKey(),
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => categories.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  mobile: text("mobile").notNull(),
-  address: text("address").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-export const supplierTransactions = pgTable("supplier_transactions", {
-  id: serial("id").primaryKey(),
-  supplierId: integer("supplier_id")
-    .notNull()
-    .references(() => suppliers.id, { onDelete: "cascade" }),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
-  type: supplierTransactionTypeEnum("type").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-export const staff = pgTable("staff", {
-  id: serial("id").primaryKey(),
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => categories.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  mobile: text("mobile").notNull(),
-  role: text("role").notNull(),
+export const entityStaffDetails = pgTable("entity_staff_details", {
+  entityId: uuid("entity_id")
+    .primaryKey()
+    .references(() => entities.id, { onDelete: "cascade" }),
+  role: staffRoleEnum("role").notNull(),
   salary: numeric("salary", { precision: 12, scale: 2 }).notNull().default("0"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const staffSalaryLogs = pgTable("staff_salary_logs", {
-  id: serial("id").primaryKey(),
-  staffId: integer("staff_id")
-    .notNull()
-    .references(() => staff.id, { onDelete: "cascade" }),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
-  date: timestamp("date", { withTimezone: true }).defaultNow().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+export const entityMemberDetails = pgTable("entity_member_details", {
+  entityId: uuid("entity_id")
+    .primaryKey()
+    .references(() => entities.id, { onDelete: "cascade" }),
+  membershipType: text("membership_type").notNull(),
+  joiningDate: date("joining_date").notNull(),
 });
 
 export const user = pgTable("user", {
@@ -196,48 +217,61 @@ export const verification = pgTable("verification", {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  categories: many(categories),
+  businesses: many(businesses),
 }));
 
-export const categoriesRelations = relations(categories, ({ one, many }) => ({
+export const businessesRelations = relations(businesses, ({ one, many }) => ({
   user: one(users, {
-    fields: [categories.userId],
+    fields: [businesses.userId],
     references: [users.id],
   }),
-  parties: many(parties),
+  entities: many(entities),
+  inventoryItems: many(businessInventory),
 }));
 
-export const partiesRelations = relations(parties, ({ one, many }) => ({
-  category: one(categories, {
-    fields: [parties.categoryId],
-    references: [categories.id],
+export const entitiesRelations = relations(entities, ({ one, many }) => ({
+  business: one(businesses, {
+    fields: [entities.businessId],
+    references: [businesses.id],
   }),
-  studentDetail: one(studentDetails, {
-    fields: [parties.id],
-    references: [studentDetails.partyId],
+  transactions: many(entityTransactions),
+  studentDetail: one(entityStudentDetails, {
+    fields: [entities.id],
+    references: [entityStudentDetails.entityId],
   }),
-  transactions: many(transactions),
-  items: many(items),
-}));
-
-export const studentDetailsRelations = relations(studentDetails, ({ one }) => ({
-  party: one(parties, {
-    fields: [studentDetails.partyId],
-    references: [parties.id],
+  staffDetail: one(entityStaffDetails, {
+    fields: [entities.id],
+    references: [entityStaffDetails.entityId],
   }),
-}));
-
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-  party: one(parties, {
-    fields: [transactions.partyId],
-    references: [parties.id],
+  memberDetail: one(entityMemberDetails, {
+    fields: [entities.id],
+    references: [entityMemberDetails.entityId],
   }),
 }));
 
-export const itemsRelations = relations(items, ({ one }) => ({
-  party: one(parties, {
-    fields: [items.partyId],
-    references: [parties.id],
+export const entityTransactionsRelations = relations(entityTransactions, ({ one }) => ({
+  entity: one(entities, {
+    fields: [entityTransactions.entityId],
+    references: [entities.id],
+  }),
+}));
+
+export const businessInventoryRelations = relations(businessInventory, ({ one, many }) => ({
+  business: one(businesses, {
+    fields: [businessInventory.businessId],
+    references: [businesses.id],
+  }),
+  supplierLinks: many(supplierInventoryLinks),
+}));
+
+export const supplierInventoryLinksRelations = relations(supplierInventoryLinks, ({ one }) => ({
+  supplier: one(entities, {
+    fields: [supplierInventoryLinks.supplierId],
+    references: [entities.id],
+  }),
+  inventoryItem: one(businessInventory, {
+    fields: [supplierInventoryLinks.inventoryId],
+    references: [businessInventory.id],
   }),
 }));
 
@@ -262,26 +296,24 @@ export const authAccountRelations = relations(account, ({ one }) => ({
 
 export const schema = {
   users,
-  categories,
-  parties,
-  studentDetails,
-  transactions,
-  items,
-  inventory,
-  suppliers,
-  supplierTransactions,
-  staff,
-  staffSalaryLogs,
+  businesses,
+  entities,
+  entityTransactions,
+  businessInventory,
+  supplierInventoryLinks,
+  entityStudentDetails,
+  entityStaffDetails,
+  entityMemberDetails,
   user,
   session,
   account,
   verification,
   usersRelations,
-  categoriesRelations,
-  partiesRelations,
-  studentDetailsRelations,
-  transactionsRelations,
-  itemsRelations,
+  businessesRelations,
+  entitiesRelations,
+  entityTransactionsRelations,
+  businessInventoryRelations,
+  supplierInventoryLinksRelations,
   authUserRelations,
   authSessionRelations,
   authAccountRelations,

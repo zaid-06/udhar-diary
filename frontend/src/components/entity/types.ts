@@ -18,7 +18,7 @@ export type EntityColumnConfig<TItem> = {
 };
 
 export type EntityPageContext = {
-  categoryId: number;
+  categoryId: string;
   activeBusiness: Category | null;
 };
 
@@ -48,7 +48,7 @@ export type EntityConfig<TItem, TDetails = unknown> = {
   addLabel: string;
   columns: EntityColumnConfig<TItem>[];
   formFields: EntityFieldConfig[];
-  getRowId: (item: TItem) => number;
+  getRowId: (item: TItem) => string | number;
   search: (item: TItem, query: string) => boolean;
   list: (ctx: EntityPageContext) => Promise<TItem[]>;
   create: (ctx: EntityPageContext, values: Record<string, string>) => Promise<void>;

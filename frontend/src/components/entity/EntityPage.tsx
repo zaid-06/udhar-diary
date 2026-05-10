@@ -26,7 +26,7 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
 
   const context = useMemo(
     () => ({
-      categoryId: activeBusinessId ?? 0,
+      categoryId: activeBusinessId ?? "",
       activeBusiness,
     }),
     [activeBusinessId, activeBusiness],

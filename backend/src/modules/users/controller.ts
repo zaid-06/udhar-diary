@@ -1,5 +1,6 @@
 import { type Request, type Response } from "express";
 import { usersService } from "./service.js";
+import { sendError, sendSuccess } from "../../utils/api-response.js";
 
 const getAuthUserContext = (req: Request) => {
   const authUser = req.auth?.user;
@@ -16,12 +17,12 @@ const getAuthUserContext = (req: Request) => {
 const getMe = async (req: Request, res: Response): Promise<void> => {
   const authUser = getAuthUserContext(req);
   if (!authUser) {
-    res.status(401).json({ message: "Unauthorized" });
+    sendError(res, "Unauthorized", 401);
     return;
   }
 
   const user = await usersService.resolveOrCreateUser(authUser);
-  res.json(user);
+  sendSuccess(res, "Current user fetched", user);
 };
 
 export const usersController = {

@@ -92,6 +92,8 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
   formFields: [
     { name: "name", label: "Name", type: "text" },
     { name: "mobile", label: "Mobile", type: "text" },
+    { name: "itemName", label: "Item Name", type: "text" },
+    { name: "price", label: "Price", type: "number" },
   ],
   getRowId: (item) => item.id,
   search: (item, q) =>
@@ -99,12 +101,23 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
   list: async (ctx) => fetchCustomers(ctx.categoryId),
   create: async (ctx, values) => {
     const categoryType = ctx.activeBusiness?.type ?? "shop";
-    await createParty({
+    const createdParty = await createParty({
       categoryId: ctx.categoryId,
       name: values.name,
       mobile: values.mobile,
       type: categoryType === "shop" ? "customer" : categoryType === "institute" ? "student" : "member",
     });
+
+    const itemName = values.itemName?.trim();
+    const price = Number(values.price);
+    if (itemName && Number.isFinite(price) && price > 0) {
+      await createTransaction({
+        partyId: createdParty.id,
+        type: "credit",
+        title: itemName,
+        amount: price,
+      });
+    }
   },
   details: {
     title: () => "Customer Details",

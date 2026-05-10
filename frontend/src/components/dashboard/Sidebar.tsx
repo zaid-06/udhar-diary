@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Dumbbell, GraduationCap, LayoutDashboard, MoreHorizontal, Search, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,17 +15,17 @@ type SidebarProps = {
   theme: ThemeMode;
   signingOut: boolean;
   businesses: Category[];
-  activeBusinessId: number | null;
+  activeBusinessId: string | null;
   onNavigateDashboard: () => void;
   onOpenCreateBusiness: () => void;
-  onSwitchBusiness: (businessId: number) => void;
+  onSwitchBusiness: (businessId: string) => void;
   onToggleTheme: () => void;
   onLogout: () => void;
   onClose: () => void;
   onToggleCollapse: () => void;
   onOpenBusinessDetails: (business: Category) => void;
-  onUpdateBusiness: (categoryId: number, payload: { name?: string; isActive?: boolean }) => Promise<void>;
-  onDeleteBusiness: (categoryId: number) => Promise<void>;
+  onUpdateBusiness: (categoryId: string, payload: { name?: string; isActive?: boolean }) => Promise<void>;
+  onDeleteBusiness: (categoryId: string) => Promise<void>;
 };
 
 export function Sidebar({

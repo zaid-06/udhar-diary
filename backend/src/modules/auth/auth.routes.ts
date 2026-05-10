@@ -3,6 +3,7 @@ import { auth } from "../../auth/auth.config.js";
 import { attachAuthSession, requireAuth } from "../../middlewares/auth.middleware.js";
 import { validate } from "../../middlewares/validate.js";
 import { env } from "../../utils/env.js";
+import { sendSuccess } from "../../utils/api-response.js";
 import { loginSchema, registerSchema } from "./auth.validation.js";
 
 const authRouter = Router();
@@ -110,7 +111,7 @@ authRouter.post("/logout", async (req, res, next) => {
 });
 
 authRouter.get("/session-user", attachAuthSession, requireAuth, (req, res) => {
-  res.json({
+  sendSuccess(res, "Current user fetched", {
     user: req.auth?.user,
     session: req.auth?.session,
   });

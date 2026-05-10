@@ -15,7 +15,7 @@ function BusinessEntryRedirect() {
 
   const targetBusinessId = useMemo(() => {
     if (!businesses?.length) return null;
-    const stored = Number(window.localStorage.getItem("selectedBusinessId"));
+    const stored = window.localStorage.getItem("selectedBusinessId");
     const exists = businesses.some((business) => business.id === stored);
     return exists ? stored : businesses[0].id;
   }, [businesses]);

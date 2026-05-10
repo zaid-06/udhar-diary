@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Moon, Plus, Sun, UserCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,9 +13,9 @@ type ProfileMenuProps = {
   theme: ThemeMode;
   signingOut: boolean;
   businesses: Category[];
-  activeBusinessId: number | null;
+  activeBusinessId: string | null;
   onOpenCreateBusiness: () => void;
-  onSwitchBusiness: (businessId: number) => void;
+  onSwitchBusiness: (businessId: string) => void;
   onToggleTheme: () => void;
   onLogout: () => void;
 };
@@ -92,7 +92,7 @@ export function ProfileMenu({
               <select
                 id="switch-business"
                 value={activeBusinessId ?? ""}
-                onChange={(event) => onSwitchBusiness(Number(event.target.value))}
+                onChange={(event) => onSwitchBusiness(event.target.value)}
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
                 {businesses.length === 0 ? (

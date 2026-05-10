@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS "staff_salary_logs" CASCADE;
+DROP TABLE IF EXISTS "staff" CASCADE;
+DROP TABLE IF EXISTS "supplier_transactions" CASCADE;
+DROP TABLE IF EXISTS "suppliers" CASCADE;
+DROP TABLE IF EXISTS "inventory" CASCADE;
+DROP TABLE IF EXISTS "transactions" CASCADE;
+DROP TABLE IF EXISTS "student_details" CASCADE;
+DROP TABLE IF EXISTS "parties" CASCADE;
+DROP TABLE IF EXISTS "categories" CASCADE;
+
+DROP TYPE IF EXISTS "party_type";
+DROP TYPE IF EXISTS "supplier_transaction_type";

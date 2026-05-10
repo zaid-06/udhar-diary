@@ -1,5 +1,5 @@
 export type ReminderPayload = {
-  customerId: number;
+  customerId: number | string;
   customerName: string;
   mobileNumber: string;
   amount: number;

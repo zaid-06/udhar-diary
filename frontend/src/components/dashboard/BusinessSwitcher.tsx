@@ -1,12 +1,12 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Category } from "@/modules/categories/api/categories.api";
 
 type BusinessSwitcherProps = {
   businesses: Category[];
-  activeBusinessId: number | null;
-  onSwitchBusiness: (businessId: number) => void;
+  activeBusinessId: string | null;
+  onSwitchBusiness: (businessId: string) => void;
   onCreateBusiness: () => void;
 };
 
