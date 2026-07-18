@@ -1,35 +1,88 @@
-# Local PostgreSQL for development. Matches default backend DATABASE_URL.
-# From repo root: docker compose up -d
-# Then: cd backend && npm run db:migrate
+version: "3.9"
 
 services:
   db:
     image: postgres:16-alpine
+    container_name: udhar-db
+    restart: unless-stopped
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: udhar_diary
+
     ports:
       - "5432:5432"
+
     volumes:
       - udhar_pgdata:/var/lib/postgresql/data
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d udhar_diary"]
-      interval: 3s
+      interval: 5s
       timeout: 5s
       retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: udhar-backend
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env
+
     depends_on:
       db:
         condition: service_healthy
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: udhar-frontend
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    environment:
+      VITE_API_URL: http://localhost:5000
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: udhar-pgadmin
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy
+
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin123
       PGADMIN_CONFIG_SERVER_MODE: "False"
+
     ports:
       - "5050:80"
+
     volumes:
       - udhar_pgadmin_data:/var/lib/pgadmin
 
