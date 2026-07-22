@@ -1,6 +1,11 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "../../db/client.js";
-import { businessInventory, businesses, entities, supplierInventoryLinks } from "../../db/schema.js";
+import {
+  businessInventory,
+  businesses,
+  entities,
+  supplierInventoryLinks,
+} from "../../db/schema.js";
 import { resolveOwnerId, type AuthUserContext } from "../shared/owner.js";
 import {
   type CreateBusinessInventoryInput,
@@ -16,11 +21,15 @@ const getOwnedBusiness = async (ownerId: number, businessId: string) => {
   return business ?? null;
 };
 
-const createInventoryItem = async (authUser: AuthUserContext, input: CreateBusinessInventoryInput) => {
+const createInventoryItem = async (
+  authUser: AuthUserContext,
+  input: CreateBusinessInventoryInput,
+) => {
   const ownerId = await resolveOwnerId(authUser);
   const business = await getOwnedBusiness(ownerId, input.businessId);
   if (!business) return { status: "business_not_found" as const };
-  if (business.type !== "shop") return { status: "unsupported_business_type" as const };
+  if (business.type !== "shop")
+    return { status: "unsupported_business_type" as const };
 
   const [created] = await db
     .insert(businessInventory)
@@ -36,6 +45,49 @@ const createInventoryItem = async (authUser: AuthUserContext, input: CreateBusin
 
   return { status: "created" as const, item: created };
 };
+
+const reduceInventory = async (
+  tx: any, // baad me Drizzle transaction type laga dena
+  businessId: string,
+  productName: string,
+  soldQuantity: number,
+) => {
+  // Quantity nahi hai to kuch mat karo
+  if (!soldQuantity) return;
+
+  // Product find karo
+  const product = await tx.query.businessInventory.findFirst({
+    where: and(
+      eq(businessInventory.businessId, businessId),
+      eq(businessInventory.productName, productName),
+    ),
+  });
+
+  // Inventory me product nahi mila
+  if (!product) {
+    return;
+  }
+
+  const currentQuantity = Number(product.quantity);
+  const remainingQuantity = currentQuantity - soldQuantity;
+
+  // Stock kam hai
+  if (remainingQuantity < 0) {
+    throw new Error(
+      `Insufficient stock. Available: ${currentQuantity} ${product.unit}`,
+    );
+  }
+
+  // Inventory update
+  await tx
+    .update(businessInventory)
+    .set({
+      quantity: remainingQuantity.toString(),
+    })
+    .where(eq(businessInventory.id, product.id));
+};
+
+export { reduceInventory };
 
 const getByBusiness = async (authUser: AuthUserContext, businessId: string) => {
   const ownerId = await resolveOwnerId(authUser);
@@ -67,11 +119,19 @@ const updateInventoryItem = async (
   const [updated] = await db
     .update(businessInventory)
     .set({
-      ...(payload.productName !== undefined ? { productName: payload.productName } : {}),
-      ...(payload.quantity !== undefined ? { quantity: payload.quantity.toString() } : {}),
+      ...(payload.productName !== undefined
+        ? { productName: payload.productName }
+        : {}),
+      ...(payload.quantity !== undefined
+        ? { quantity: payload.quantity.toString() }
+        : {}),
       ...(payload.unit !== undefined ? { unit: payload.unit } : {}),
-      ...(payload.purchasePrice !== undefined ? { purchasePrice: payload.purchasePrice.toString() } : {}),
-      ...(payload.sellingPrice !== undefined ? { sellingPrice: payload.sellingPrice.toString() } : {}),
+      ...(payload.purchasePrice !== undefined
+        ? { purchasePrice: payload.purchasePrice.toString() }
+        : {}),
+      ...(payload.sellingPrice !== undefined
+        ? { sellingPrice: payload.sellingPrice.toString() }
+        : {}),
     })
     .from(businesses)
     .where(
@@ -103,7 +163,11 @@ const deleteInventoryItem = async (authUser: AuthUserContext, id: string) => {
   return !!deleted;
 };
 
-const linkSupplierToInventory = async (authUser: AuthUserContext, supplierId: string, inventoryId: string) => {
+const linkSupplierToInventory = async (
+  authUser: AuthUserContext,
+  supplierId: string,
+  inventoryId: string,
+) => {
   const ownerId = await resolveOwnerId(authUser);
   const [candidate] = await db
     .select({
@@ -112,7 +176,10 @@ const linkSupplierToInventory = async (authUser: AuthUserContext, supplierId: st
     })
     .from(entities)
     .innerJoin(businesses, eq(businesses.id, entities.businessId))
-    .innerJoin(businessInventory, eq(businessInventory.businessId, businesses.id))
+    .innerJoin(
+      businessInventory,
+      eq(businessInventory.businessId, businesses.id),
+    )
     .where(
       and(
         eq(entities.id, supplierId),

@@ -26,5 +26,9 @@ export const supplierInventoryLinkSchema = z.object({
   inventoryId: z.string().uuid(),
 });
 
-export type CreateBusinessInventoryInput = z.infer<typeof createBusinessInventorySchema>;
-export type UpdateBusinessInventoryInput = z.infer<typeof updateBusinessInventorySchema>;
+export type CreateBusinessInventoryInput = z.infer<
+  typeof createBusinessInventorySchema
+>;
+export type UpdateBusinessInventoryInput = z.infer<
+  typeof updateBusinessInventorySchema
+>;

@@ -9,4 +9,3 @@ export const useCategories = (enabled: boolean) =>
     queryFn: fetchCategories,
     enabled,
   });
-
