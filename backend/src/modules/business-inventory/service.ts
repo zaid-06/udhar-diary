@@ -35,7 +35,7 @@ const createInventoryItem = async (
     .insert(businessInventory)
     .values({
       businessId: input.businessId,
-      productName: input.productName,
+      productName: toTitleCase(input.productName),
       quantity: input.quantity.toString(),
       unit: input.unit,
       purchasePrice: input.purchasePrice.toString(),
@@ -45,6 +45,14 @@ const createInventoryItem = async (
 
   return { status: "created" as const, item: created };
 };
+function toTitleCase(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 const reduceInventory = async (
   tx: any, // baad me Drizzle transaction type laga dena

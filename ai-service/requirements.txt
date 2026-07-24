@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+langchain
+python-dotenv
+pillow
+langchain-google-genai
+langchain_community
+
+langchain-core
+google-genai
+google-ai-generativelanguage
+
+python-multipart

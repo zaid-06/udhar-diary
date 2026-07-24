@@ -8,9 +8,15 @@ import {
   entityStudentDetails,
 } from "../../db/schema.js";
 import { resolveOwnerId, type AuthUserContext } from "../shared/owner.js";
-import { type CreateEntityInput, type UpdateEntityInput } from "./validation.js";
+import {
+  type CreateEntityInput,
+  type UpdateEntityInput,
+} from "./validation.js";
 
-const allowedEntityCategories: Record<"shop" | "institute" | "gym", Set<CreateEntityInput["category"]>> = {
+const allowedEntityCategories: Record<
+  "shop" | "institute" | "gym",
+  Set<CreateEntityInput["category"]>
+> = {
   shop: new Set(["customer", "supplier", "staff"]),
   institute: new Set(["student", "teacher", "staff"]),
   gym: new Set(["member", "trainer"]),
@@ -26,13 +32,19 @@ const getOwnedBusiness = async (ownerId: number, businessId: string) => {
   return business ?? null;
 };
 
-const createEntity = async (authUser: AuthUserContext, input: CreateEntityInput) => {
+const createEntity = async (
+  authUser: AuthUserContext,
+  input: CreateEntityInput,
+) => {
   const ownerId = await resolveOwnerId(authUser);
   const business = await getOwnedBusiness(ownerId, input.businessId);
   if (!business) return { status: "business_not_found" as const };
 
   if (!allowedEntityCategories[business.type].has(input.category)) {
-    return { status: "invalid_category_for_business_type" as const, businessType: business.type };
+    return {
+      status: "invalid_category_for_business_type" as const,
+      businessType: business.type,
+    };
   }
 
   const created = await db.transaction(async (tx) => {
@@ -40,7 +52,7 @@ const createEntity = async (authUser: AuthUserContext, input: CreateEntityInput)
       .insert(entities)
       .values({
         businessId: input.businessId,
-        name: input.name,
+        name: toTitleCase(input.name),
         mobile: input.mobile,
         address: input.address,
         category: input.category,
@@ -56,7 +68,12 @@ const createEntity = async (authUser: AuthUserContext, input: CreateEntityInput)
       });
     }
 
-    if ((input.category === "staff" || input.category === "teacher" || input.category === "trainer") && input.staffDetails) {
+    if (
+      (input.category === "staff" ||
+        input.category === "teacher" ||
+        input.category === "trainer") &&
+      input.staffDetails
+    ) {
       await tx.insert(entityStaffDetails).values({
         entityId: row.id,
         role: input.staffDetails.role,
@@ -77,6 +94,14 @@ const createEntity = async (authUser: AuthUserContext, input: CreateEntityInput)
 
   return { status: "created" as const, entity: created };
 };
+function toTitleCase(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 type EntityListFilters = {
   businessId?: string;
@@ -84,7 +109,10 @@ type EntityListFilters = {
   search?: string;
 };
 
-const getEntities = async (authUser: AuthUserContext, filters: EntityListFilters) => {
+const getEntities = async (
+  authUser: AuthUserContext,
+  filters: EntityListFilters,
+) => {
   const ownerId = await resolveOwnerId(authUser);
   if (!filters.businessId) return [];
   const business = await getOwnedBusiness(ownerId, filters.businessId);
@@ -95,7 +123,12 @@ const getEntities = async (authUser: AuthUserContext, filters: EntityListFilters
     whereConditions.push(eq(entities.category, filters.category));
   }
   if (filters.search) {
-    whereConditions.push(or(ilike(entities.name, `%${filters.search}%`), ilike(entities.mobile, `%${filters.search}%`))!);
+    whereConditions.push(
+      or(
+        ilike(entities.name, `%${filters.search}%`),
+        ilike(entities.mobile, `%${filters.search}%`),
+      )!,
+    );
   }
 
   return db
@@ -164,13 +197,23 @@ const toggleReminder = async (authUser: AuthUserContext, entityId: string) => {
   return updated ?? null;
 };
 
-const updateEntity = async (authUser: AuthUserContext, entityId: string, input: UpdateEntityInput) => {
+const updateEntity = async (
+  authUser: AuthUserContext,
+  entityId: string,
+  input: UpdateEntityInput,
+) => {
   const ownerId = await resolveOwnerId(authUser);
   const [updated] = await db
     .update(entities)
     .set(input)
     .from(businesses)
-    .where(and(eq(entities.id, entityId), eq(entities.businessId, businesses.id), eq(businesses.userId, ownerId)))
+    .where(
+      and(
+        eq(entities.id, entityId),
+        eq(entities.businessId, businesses.id),
+        eq(businesses.userId, ownerId),
+      ),
+    )
     .returning();
 
   return updated ?? null;

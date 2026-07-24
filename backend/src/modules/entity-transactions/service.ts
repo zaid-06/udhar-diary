@@ -42,7 +42,7 @@ const createTransaction = async (
       .values({
         entityId: input.entityId,
         category: input.category,
-        title: input.title,
+        title: toTitleCase(input.title),
         amount: input.amount.toString(),
         quantity: input.quantity?.toString(),
         unit: input.unit,
@@ -61,7 +61,7 @@ const createTransaction = async (
     await reduceInventory(
       tx,
       entity.businessId,
-      input.title,
+      toTitleCase(input.title),
       Number(input.quantity ?? 0),
     );
 
@@ -70,6 +70,14 @@ const createTransaction = async (
 
   return { status: "created" as const, transaction: created };
 };
+function toTitleCase(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 const getByEntity = async (authUser: AuthUserContext, entityId: string) => {
   const ownerId = await resolveOwnerId(authUser);
