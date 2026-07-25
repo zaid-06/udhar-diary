@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import { z } from "zod";
 import { businessInventoryService } from "./service.js";
+import { extractInventorySlip } from "./ai.service.js";
 import {
   businessInventoryQuerySchema,
   supplierInventoryLinkSchema,
@@ -95,10 +96,89 @@ const linkSupplierToInventory = async (
   sendSuccess(res, "Supplier linked to inventory", row, 201);
 };
 
+// ai-service
+
+const extractSlip = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Check uploaded image
+    if (!req.file) {
+      return void sendError(res, "Image is required", 400);
+    }
+
+    // Check authentication
+    const authUser = getAuthUserContext(req);
+    if (!authUser) {
+      return void sendError(res, "Unauthorized", 401);
+    }
+
+    // Check businessId
+    const { businessId } = req.body;
+
+    if (!businessId) {
+      return void sendError(res, "Business ID is required", 400);
+    }
+
+    // Call AI Service
+    const aiResponse = await extractInventorySlip(req.file);
+
+    // Save extracted products into inventory
+    const result = await businessInventoryService.bulkCreateInventoryItems(
+      authUser,
+      businessId,
+      aiResponse.text.items,
+    );
+
+    if (result.status === "business_not_found") {
+      return void sendError(res, "Business not found", 404);
+    }
+
+    if (result.status === "unsupported_business_type") {
+      return void sendError(
+        res,
+        "Inventory is supported only for shop businesses",
+        400,
+      );
+    }
+
+    return void sendSuccess(
+      res,
+      "Slip extracted and inventory updated successfully",
+      {
+        purchaseDate: aiResponse.text.purchase_date,
+        inventory: result.items,
+      },
+    );
+  } catch (error) {
+    console.error(error);
+
+    return void sendError(res, "Failed to extract slip", 500);
+  }
+};
+// const extractSlip = async (req: Request, res: Response) => {
+//   if (!req.file) {
+//     return sendError(res, "Image is required", 400);
+//   }
+
+//   // const data = await extractInventorySlip(req.file);
+//   const aiResponse = await extractInventorySlip(req.file);
+
+//   const authUser = getAuthUserContext(req);
+//   if (!authUser) return void sendError(res, "Unauthorized", 401);
+
+//   await businessInventoryService.bulkCreateInventoryItems(
+//       authUser,
+//       req.body.businessId,
+//       aiResponse.text.items
+//   );
+
+//   sendSuccess(res, "Slip extracted successfully", aiResponse);
+// };
+
 export const businessInventoryController = {
   createInventoryItem,
   getByBusiness,
   updateInventoryItem,
   deleteInventoryItem,
   linkSupplierToInventory,
+  extractSlip,
 };

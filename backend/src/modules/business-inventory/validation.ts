@@ -16,6 +16,21 @@ export const updateBusinessInventorySchema = z.object({
   purchasePrice: z.coerce.number().min(0).optional(),
   sellingPrice: z.coerce.number().min(0).optional(),
 });
+export const invoiceItemSchema = z.object({
+  product_name: z.string().trim().min(1),
+  quantity: z.coerce.number().min(0),
+  unit: z.string().trim().min(1),
+  purchase_price: z.coerce.number().min(0),
+});
+
+export const extractSlipResponseSchema = z.object({
+  purchase_date: z.string(),
+  items: z.array(invoiceItemSchema),
+});
+
+export type InvoiceItem = z.infer<typeof invoiceItemSchema>;
+
+export type ExtractSlipResponse = z.infer<typeof extractSlipResponseSchema>;
 
 export const businessInventoryQuerySchema = z.object({
   businessId: z.string().uuid(),

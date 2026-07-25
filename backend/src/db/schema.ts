@@ -18,10 +18,15 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
-export const transactionTypeEnum = pgEnum("transaction_type", ["credit", "debit"]);
+export const transactionTypeEnum = pgEnum("transaction_type", [
+  "credit",
+  "debit",
+]);
 export const transactionCategoryEnum = pgEnum("transaction_category", [
   "item",
   "fees",
@@ -31,7 +36,11 @@ export const transactionCategoryEnum = pgEnum("transaction_category", [
   "membership",
   "other",
 ]);
-export const categoryTypeEnum = pgEnum("category_type", ["shop", "institute", "gym"]);
+export const categoryTypeEnum = pgEnum("category_type", [
+  "shop",
+  "institute",
+  "gym",
+]);
 export const entityCategoryEnum = pgEnum("entity_category", [
   "customer",
   "supplier",
@@ -41,7 +50,11 @@ export const entityCategoryEnum = pgEnum("entity_category", [
   "teacher",
   "trainer",
 ]);
-export const staffRoleEnum = pgEnum("staff_role", ["teacher", "staff", "trainer"]);
+export const staffRoleEnum = pgEnum("staff_role", [
+  "teacher",
+  "staff",
+  "trainer",
+]);
 
 export const businesses = pgTable(
   "businesses",
@@ -53,12 +66,17 @@ export const businesses = pgTable(
     name: text("name").notNull(),
     type: categoryTypeEnum("type").notNull(),
     address: text("address").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (table) => ({
     userIdIdx: index("businesses_user_id_idx").on(table.userId),
-    activeByUserIdx: index("businesses_active_by_user_idx").on(table.userId, table.deletedAt),
+    activeByUserIdx: index("businesses_active_by_user_idx").on(
+      table.userId,
+      table.deletedAt,
+    ),
   }),
 );
 
@@ -73,9 +91,13 @@ export const entities = pgTable(
     mobile: text("mobile").notNull(),
     address: text("address"),
     category: entityCategoryEnum("category").notNull(),
-    totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).notNull().default("0"),
+    totalAmount: numeric("total_amount", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
     reminderEnabled: boolean("reminder_enabled").notNull().default(true),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
     businessIdIdx: index("entities_business_id_idx").on(table.businessId),
@@ -97,11 +119,15 @@ export const entityTransactions = pgTable(
     unit: text("unit"),
     metadata: jsonb("metadata"),
     type: transactionTypeEnum("type").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
     entityIdIdx: index("entity_transactions_entity_id_idx").on(table.entityId),
-    createdAtIdx: index("entity_transactions_created_at_idx").on(table.createdAt),
+    createdAtIdx: index("entity_transactions_created_at_idx").on(
+      table.createdAt,
+    ),
     categoryIdx: index("entity_transactions_category_idx").on(table.category),
   }),
 );
@@ -114,14 +140,24 @@ export const businessInventory = pgTable(
       .notNull()
       .references(() => businesses.id, { onDelete: "cascade" }),
     productName: text("product_name").notNull(),
-    quantity: numeric("quantity", { precision: 12, scale: 2 }).notNull().default("0"),
+    quantity: numeric("quantity", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
     unit: text("unit").notNull().default("pcs"),
-    purchasePrice: numeric("purchase_price", { precision: 12, scale: 2 }).notNull().default("0"),
-    sellingPrice: numeric("selling_price", { precision: 12, scale: 2 }).notNull().default("0"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    purchasePrice: numeric("purchase_price", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
+    sellingPrice: numeric("selling_price", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
-    businessIdIdx: index("business_inventory_business_id_idx").on(table.businessId),
+    businessIdIdx: index("business_inventory_business_id_idx").on(
+      table.businessId,
+    ),
   }),
 );
 
@@ -135,10 +171,15 @@ export const supplierInventoryLinks = pgTable(
     inventoryId: uuid("inventory_id")
       .notNull()
       .references(() => businessInventory.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
-    supplierInventoryUnique: index("supplier_inventory_unique_idx").on(table.supplierId, table.inventoryId),
+    supplierInventoryUnique: index("supplier_inventory_unique_idx").on(
+      table.supplierId,
+      table.inventoryId,
+    ),
   }),
 );
 
@@ -199,8 +240,12 @@ export const account = pgTable("account", {
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
-  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", {
+    withTimezone: true,
+  }),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+    withTimezone: true,
+  }),
   scope: text("scope"),
   password: text("password"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
@@ -249,31 +294,40 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
   }),
 }));
 
-export const entityTransactionsRelations = relations(entityTransactions, ({ one }) => ({
-  entity: one(entities, {
-    fields: [entityTransactions.entityId],
-    references: [entities.id],
+export const entityTransactionsRelations = relations(
+  entityTransactions,
+  ({ one }) => ({
+    entity: one(entities, {
+      fields: [entityTransactions.entityId],
+      references: [entities.id],
+    }),
   }),
-}));
+);
 
-export const businessInventoryRelations = relations(businessInventory, ({ one, many }) => ({
-  business: one(businesses, {
-    fields: [businessInventory.businessId],
-    references: [businesses.id],
+export const businessInventoryRelations = relations(
+  businessInventory,
+  ({ one, many }) => ({
+    business: one(businesses, {
+      fields: [businessInventory.businessId],
+      references: [businesses.id],
+    }),
+    supplierLinks: many(supplierInventoryLinks),
   }),
-  supplierLinks: many(supplierInventoryLinks),
-}));
+);
 
-export const supplierInventoryLinksRelations = relations(supplierInventoryLinks, ({ one }) => ({
-  supplier: one(entities, {
-    fields: [supplierInventoryLinks.supplierId],
-    references: [entities.id],
+export const supplierInventoryLinksRelations = relations(
+  supplierInventoryLinks,
+  ({ one }) => ({
+    supplier: one(entities, {
+      fields: [supplierInventoryLinks.supplierId],
+      references: [entities.id],
+    }),
+    inventoryItem: one(businessInventory, {
+      fields: [supplierInventoryLinks.inventoryId],
+      references: [businessInventory.id],
+    }),
   }),
-  inventoryItem: one(businessInventory, {
-    fields: [supplierInventoryLinks.inventoryId],
-    references: [businessInventory.id],
-  }),
-}));
+);
 
 export const authUserRelations = relations(user, ({ many }) => ({
   sessions: many(session),

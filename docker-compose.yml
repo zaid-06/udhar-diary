@@ -23,6 +23,19 @@ services:
       timeout: 5s
       retries: 5
 
+  ai-service:
+    build:
+      context: ./ai-service
+
+    container_name: ai-service
+    restart: unless-stopped
+
+    env_file:
+      - ./ai-service/.env
+
+    ports:
+      - "8000:8000"
+
   backend:
     build:
       context: ./backend
@@ -37,6 +50,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      ai-service:
+        condition: service_started
 
     ports:
       - "5000:5000"

@@ -11,6 +11,8 @@ import {
   type CreateBusinessInventoryInput,
   type UpdateBusinessInventoryInput,
 } from "./validation.js";
+import { extractInventorySlip } from "./ai.service.js";
+import type { InvoiceItem } from "./validation.js";
 
 const getOwnedBusiness = async (ownerId: number, businessId: string) => {
   const [business] = await db
@@ -212,7 +214,47 @@ const linkSupplierToInventory = async (
   return link ?? { supplierId, inventoryId };
 };
 
+const extractSlip = async (file: Express.Multer.File) => {
+  const result = await extractInventorySlip(file);
+
+  return result;
+};
+
+const bulkCreateInventoryItems = async (
+  authUser: AuthUserContext,
+  businessId: string,
+  items: InvoiceItem[],
+) => {
+  const ownerId = await resolveOwnerId(authUser);
+
+  const business = await getOwnedBusiness(ownerId, businessId);
+
+  if (!business) return { status: "business_not_found" as const };
+
+  if (business.type !== "shop")
+    return { status: "unsupported_business_type" as const };
+
+  const values = items.map((item) => ({
+    businessId,
+    productName: toTitleCase(item.product_name),
+    quantity: item.quantity.toString(),
+    unit: item.unit,
+    purchasePrice: item.purchase_price.toString(),
+
+    // default
+    sellingPrice: "0",
+  }));
+
+  const created = await db.insert(businessInventory).values(values).returning();
+
+  return {
+    status: "created" as const,
+    items: created,
+  };
+};
+
 export const businessInventoryService = {
+  bulkCreateInventoryItems,
   createInventoryItem,
   getByBusiness,
   updateInventoryItem,
