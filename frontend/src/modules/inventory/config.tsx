@@ -1,7 +1,12 @@
 ﻿import { Button } from "@/components/ui/button";
 import { formatInr } from "@/shared/lib/format-currency";
 import { type EntityConfig } from "@/components/entity/types";
-import { createInventory, deleteInventory, fetchInventory, type InventoryItem } from "./api";
+import {
+  createInventory,
+  deleteInventory,
+  fetchInventory,
+  type InventoryItem,
+} from "./api";
 
 export const inventoryConfig: EntityConfig<InventoryItem, null> = {
   module: "inventory",
@@ -9,15 +14,33 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
   subtitle: "Track products, stock, and pricing.",
   addLabel: "Add Product",
   columns: [
-    { key: "productName", label: "Product Name", className: "pl-6 font-medium" },
-    { key: "quantity", label: "Quantity", render: (item) => `${item.quantity} ${item.unit}` },
-    { key: "sellingPrice", label: "Price", render: (item) => formatInr(item.sellingPrice) },
+    {
+      key: "productName",
+      label: "Product Name",
+      className: "pl-6 font-medium",
+    },
+    {
+      key: "quantity",
+      label: "Quantity",
+      render: (item) => `${item.quantity} ${item.unit}`,
+    },
+    {
+      key: "sellingPrice",
+      label: "Price",
+      render: (item) => formatInr(item.sellingPrice),
+    },
     {
       key: "lowStock",
       label: "Stock Status",
       className: "pr-6 text-right",
       render: (item) => (
-        <span className={item.lowStock ? "text-red-600 text-xs font-medium" : "text-green-600 text-xs font-medium"}>
+        <span
+          className={
+            item.lowStock
+              ? "text-red-600 text-xs font-medium"
+              : "text-green-600 text-xs font-medium"
+          }
+        >
           {item.lowStock ? "Low" : "Healthy"}
         </span>
       ),
@@ -58,8 +81,16 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
         </div>
       </div>
     ),
-    renderLogs: () => <p className="text-sm text-muted-foreground">Inventory activity log can be extended here.</p>,
-    renderEntry: () => <p className="text-sm text-muted-foreground">Use edit API for stock updates.</p>,
+    renderLogs: () => (
+      <p className="text-sm text-muted-foreground">
+        Inventory activity log can be extended here.
+      </p>
+    ),
+    renderEntry: () => (
+      <p className="text-sm text-muted-foreground">
+        Use edit API for stock updates.
+      </p>
+    ),
     renderActionBar: (item, _, { reload, close }) => (
       <div className="flex justify-end">
         <Button
@@ -76,4 +107,3 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
     ),
   },
 };
-

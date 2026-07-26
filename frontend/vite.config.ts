@@ -9,6 +9,9 @@ export default defineConfig({
     host: "0.0.0.0", // Required for Docker
     port: 3000,
     strictPort: true,
+    watch: {
+      usePolling: true,
+    },
   },
   resolve: {
     alias: {

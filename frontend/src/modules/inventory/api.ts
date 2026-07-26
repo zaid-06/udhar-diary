@@ -72,3 +72,35 @@ export const deleteInventory = async (id: string) => {
   await api.delete(`/v1/inventory/${id}`);
 };
 
+const dataUrlToFile = (dataUrl: string, filename: string): File => {
+  const [header, base64] = dataUrl.split(",");
+  const mime = /data:(.*?);/.exec(header)?.[1] ?? "image/jpeg";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new File([bytes], filename, { type: mime });
+};
+
+export type ExtractSlipResult = {
+  purchaseDate: string;
+  inventory: InventoryApiItem[];
+};
+
+export const extractInventorySlip = async (businessId: string, imageDataUrl: string) => {
+  const file = dataUrlToFile(imageDataUrl, `slip-${Date.now()}.jpg`);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("businessId", businessId);
+
+  const { data } = await api.post<ApiEnvelope<ExtractSlipResult>>(
+    "/v1/inventory/extract-slip",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
+  return data.data;
+};
+

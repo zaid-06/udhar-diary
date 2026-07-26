@@ -1,4 +1,5 @@
-﻿import { SearchBar } from "@/components/SearchBar";
+﻿import { type ReactNode } from "react";
+import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
 
 type EntityToolbarProps = {
@@ -6,6 +7,7 @@ type EntityToolbarProps = {
   onSearchChange: (value: string) => void;
   addLabel: string;
   onAddClick: () => void;
+  extraActions?: ReactNode;
 };
 
 export function EntityToolbar({
@@ -13,13 +15,17 @@ export function EntityToolbar({
   onSearchChange,
   addLabel,
   onAddClick,
+  extraActions,
 }: EntityToolbarProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <SearchBar value={searchValue} onChange={onSearchChange} />
-      <Button type="button" onClick={onAddClick}>
-        + {addLabel}
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button type="button" onClick={onAddClick}>
+          + {addLabel}
+        </Button>
+        {extraActions}
+      </div>
     </div>
   );
 }

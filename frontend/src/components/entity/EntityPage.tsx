@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Header } from "@/layout/Header";
 import type { AppLayoutContext } from "@/layout/AppLayout";
 import { EntityToolbar } from "./EntityToolbar";
@@ -11,11 +17,27 @@ import { type EntityConfig } from "./types";
 
 type EntityPageProps<TItem, TDetails> = {
   config: EntityConfig<TItem, TDetails>;
+  toolbarExtra?: ReactNode | ((ctx: EntityToolbarExtraContext) => ReactNode);
+  beforeCard?: ReactNode;
 };
 
-export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, TDetails>) {
-  const { businesses, activeBusinessId, activeBusiness, onSwitchBusiness, onOpenCreateBusiness } =
-    useOutletContext<AppLayoutContext>();
+export type EntityToolbarExtraContext = {
+  businessId: string | null;
+  reloadList: () => Promise<void>;
+};
+
+export function EntityPage<TItem, TDetails>({
+  config,
+  toolbarExtra,
+  beforeCard,
+}: EntityPageProps<TItem, TDetails>) {
+  const {
+    businesses,
+    activeBusinessId,
+    activeBusiness,
+    onSwitchBusiness,
+    onOpenCreateBusiness,
+  } = useOutletContext<AppLayoutContext>();
 
   const [rows, setRows] = useState<TItem[]>([]);
   const [search, setSearch] = useState("");
@@ -60,6 +82,11 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
     }
   };
 
+  const resolvedToolbarExtra =
+    typeof toolbarExtra === "function"
+      ? toolbarExtra({ businessId: activeBusinessId, reloadList: loadList })
+      : toolbarExtra;
+
   return (
     <div className="space-y-4">
       <Header
@@ -70,7 +97,15 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
         onCreateBusiness={onOpenCreateBusiness}
       />
 
-      <EntityToolbar searchValue={search} onSearchChange={setSearch} addLabel={config.addLabel} onAddClick={() => setOpenAdd(true)} />
+      <EntityToolbar
+        searchValue={search}
+        onSearchChange={setSearch}
+        addLabel={config.addLabel}
+        onAddClick={() => setOpenAdd(true)}
+        extraActions={resolvedToolbarExtra}
+      />
+
+      {beforeCard}
 
       <Card className="border-0 shadow-md ring-1 ring-border/60">
         <CardHeader className="border-b border-border/60 bg-card pb-0">
@@ -78,7 +113,12 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
           <CardDescription>{config.subtitle}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <EntityTable rows={filteredRows} columns={config.columns} onRowClick={openDetails} onReload={loadList} />
+          <EntityTable
+            rows={filteredRows}
+            columns={config.columns}
+            onRowClick={openDetails}
+            onReload={loadList}
+          />
         </CardContent>
       </Card>
 
@@ -115,4 +155,3 @@ export function EntityPage<TItem, TDetails>({ config }: EntityPageProps<TItem, T
     </div>
   );
 }
-
