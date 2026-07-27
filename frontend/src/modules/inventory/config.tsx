@@ -25,9 +25,9 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
       render: (item) => `${item.quantity} ${item.unit}`,
     },
     {
-      key: "sellingPrice",
+      key: "purchasePrice",
       label: "Price",
-      render: (item) => formatInr(item.sellingPrice),
+      render: (item) => formatInr(item.purchasePrice),
     },
     {
       key: "lowStock",
