@@ -140,9 +140,10 @@ export function EntityPage<TItem, TDetails>({
         loading={detailsLoading}
         config={config.details}
         onReload={async () => {
-          if (!selected || !config.details.loadDetails) return;
-          const loaded = await config.details.loadDetails(selected);
-          setDetails(loaded);
+          if (selected && config.details.loadDetails) {
+            const loaded = await config.details.loadDetails(selected);
+            setDetails(loaded);
+          }
           await loadList();
         }}
         onOpenChange={(open) => {
