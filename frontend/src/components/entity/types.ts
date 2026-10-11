@@ -6,8 +6,9 @@ export type EntityModuleKey = "customers" | "inventory" | "suppliers" | "staff";
 export type EntityFieldConfig = {
   name: string;
   label: string;
-  type: "text" | "number";
+  type: "text" | "number" | "select";
   placeholder?: string;
+  options?: { value: string; label: string }[];
 };
 
 export type EntityColumnConfig<TItem> = {

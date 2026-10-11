@@ -18,6 +18,11 @@ export type InventoryItem = {
   lowStock: boolean;
 };
 
+export type InventoryUnitOption = {
+  value: string;
+  label: string;
+};
+
 type InventoryApiItem = {
   id: string;
   businessId: string;
@@ -46,6 +51,15 @@ export const fetchInventory = async (categoryId: string) => {
     params: { businessId: categoryId },
   });
   return data.data.map(mapInventory);
+};
+
+export const defaultInventoryUnitOptions: InventoryUnitOption[] = [
+  { value: "pcs", label: "pcs" },
+];
+
+export const fetchInventoryUnitTypes = async () => {
+  const { data } = await api.get<ApiEnvelope<InventoryUnitOption[]>>("/v1/inventory/unit-types");
+  return data.data;
 };
 
 export const createInventory = async (payload: Omit<InventoryItem, "id" | "createdAt" | "lowStock">) => {

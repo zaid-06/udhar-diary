@@ -55,6 +55,22 @@ export const staffRoleEnum = pgEnum("staff_role", [
   "staff",
   "trainer",
 ]);
+export const inventoryUnitValues = [
+  "pcs",
+  "kg",
+  "gram",
+  "liter",
+  "ml",
+  "meter",
+  "cm",
+  "boxes",
+  "set",
+  "dozen",
+  "packet",
+  "bag",
+  "roll",
+] as const;
+export const inventoryUnitEnum = pgEnum("inventory_unit", inventoryUnitValues);
 
 export const businesses = pgTable(
   "businesses",
@@ -143,7 +159,7 @@ export const businessInventory = pgTable(
     quantity: numeric("quantity", { precision: 12, scale: 2 })
       .notNull()
       .default("0"),
-    unit: text("unit").notNull().default("pcs"),
+    unit: inventoryUnitEnum("unit").notNull().default("pcs"),
     purchasePrice: numeric("purchase_price", { precision: 12, scale: 2 })
       .notNull()
       .default("0"),
@@ -163,6 +179,7 @@ export const businessInventory = pgTable(
 
 export const supplierInventoryLinks = pgTable(
   "supplier_inventory_links",
+
   {
     id: uuid("id").defaultRandom().primaryKey(),
     supplierId: uuid("supplier_id")

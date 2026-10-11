@@ -4,6 +4,7 @@ import {
   businessInventory,
   businesses,
   entities,
+  inventoryUnitValues,
   supplierInventoryLinks,
 } from "../../db/schema.js";
 import { resolveOwnerId, type AuthUserContext } from "../shared/owner.js";
@@ -55,6 +56,44 @@ function toTitleCase(text: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+const normalizeInventoryUnit = (unit: string) => {
+  const normalized = unit.trim().toLowerCase();
+  const aliases: Record<string, (typeof inventoryUnitValues)[number]> = {
+    piece: "pcs",
+    pieces: "pcs",
+    pc: "pcs",
+    kgs: "kg",
+    kilogram: "kg",
+    kilograms: "kg",
+    grams: "gram",
+    g: "gram",
+    litre: "liter",
+    litres: "liter",
+    liters: "liter",
+    l: "liter",
+    milliliter: "ml",
+    milliliters: "ml",
+    metre: "meter",
+    metres: "meter",
+    meters: "meter",
+    m: "meter",
+    centimeters: "cm",
+    centimetres: "cm",
+    box: "boxes",
+    sets: "set",
+    packets: "packet",
+    pkt: "packet",
+    bags: "bag",
+    rolls: "roll",
+  };
+
+  if (inventoryUnitValues.includes(normalized as (typeof inventoryUnitValues)[number])) {
+    return normalized as (typeof inventoryUnitValues)[number];
+  }
+
+  return aliases[normalized] ?? "pcs";
+};
 
 const reduceInventory = async (
   tx: any, // baad me Drizzle transaction type laga dena
@@ -238,7 +277,7 @@ const bulkCreateInventoryItems = async (
     businessId,
     productName: toTitleCase(item.product_name),
     quantity: item.quantity.toString(),
-    unit: item.unit,
+    unit: normalizeInventoryUnit(item.unit),
     purchasePrice: item.purchase_price.toString(),
 
     // default

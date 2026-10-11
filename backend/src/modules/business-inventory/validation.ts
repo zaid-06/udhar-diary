@@ -1,10 +1,17 @@
 import { z } from "zod";
+import { inventoryUnitValues } from "../../db/schema.js";
+
+export const inventoryUnitSchema = z.enum(inventoryUnitValues);
+export const inventoryUnitOptions = inventoryUnitValues.map((value) => ({
+  value,
+  label: value,
+}));
 
 export const createBusinessInventorySchema = z.object({
   businessId: z.string().uuid(),
   productName: z.string().trim().min(1),
   quantity: z.coerce.number().min(0),
-  unit: z.string().trim().min(1).default("pcs"),
+  unit: inventoryUnitSchema.default("pcs"),
   purchasePrice: z.coerce.number().min(0),
   sellingPrice: z.coerce.number().min(0),
 });
@@ -12,7 +19,7 @@ export const createBusinessInventorySchema = z.object({
 export const updateBusinessInventorySchema = z.object({
   productName: z.string().trim().min(1).optional(),
   quantity: z.coerce.number().min(0).optional(),
-  unit: z.string().trim().min(1).optional(),
+  unit: inventoryUnitSchema.optional(),
   purchasePrice: z.coerce.number().min(0).optional(),
   sellingPrice: z.coerce.number().min(0).optional(),
 });

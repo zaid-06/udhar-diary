@@ -4,6 +4,7 @@ import { type EntityConfig } from "@/components/entity/types";
 import {
   createInventory,
   deleteInventory,
+  defaultInventoryUnitOptions,
   fetchInventory,
   type InventoryItem,
 } from "./api";
@@ -49,7 +50,7 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
   formFields: [
     { name: "productName", label: "Product Name", type: "text" },
     { name: "quantity", label: "Quantity", type: "number" },
-    { name: "unit", label: "Unit", type: "text", placeholder: "kg / pcs" },
+    { name: "unit", label: "Unit", type: "select", options: defaultInventoryUnitOptions },
     { name: "purchasePrice", label: "Purchase Price", type: "number" },
     { name: "sellingPrice", label: "Selling Price", type: "number" },
   ],

@@ -4,6 +4,7 @@ import { businessInventoryService } from "./service.js";
 import { extractInventorySlip } from "./ai.service.js";
 import {
   businessInventoryQuerySchema,
+  inventoryUnitOptions,
   supplierInventoryLinkSchema,
   updateBusinessInventorySchema,
 } from "./validation.js";
@@ -48,6 +49,10 @@ const getByBusiness = async (req: Request, res: Response): Promise<void> => {
   );
   if (!rows) return void sendError(res, "Business not found", 404);
   sendSuccess(res, "Inventory fetched", rows);
+};
+
+const getUnitTypes = (_req: Request, res: Response): void => {
+  sendSuccess(res, "Inventory unit types fetched", inventoryUnitOptions);
 };
 
 const updateInventoryItem = async (
@@ -175,6 +180,7 @@ const extractSlip = async (req: Request, res: Response): Promise<void> => {
 // };
 
 export const businessInventoryController = {
+  getUnitTypes,
   createInventoryItem,
   getByBusiness,
   updateInventoryItem,

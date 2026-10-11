@@ -11,6 +11,10 @@ import { upload } from "../../middlewares/upload.js";
 const businessInventoryRouter = Router();
 
 businessInventoryRouter.use(attachAuthSession, requireAuth);
+businessInventoryRouter.get(
+  "/unit-types",
+  businessInventoryController.getUnitTypes,
+);
 businessInventoryRouter.post(
   "/",
   validate(createBusinessInventorySchema),
