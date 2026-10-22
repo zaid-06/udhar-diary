@@ -172,8 +172,15 @@ function CustomerEntrySection({
             await createTransaction({
               partyId: item.id,
               type: "credit",
+              category: selectedProduct ? "item" : "other",
               title: title || "Entry",
               amount: numeric,
+              ...(selectedProduct
+                ? {
+                    quantity: numericQuantity,
+                    unit: selectedProduct.unit,
+                  }
+                : {}),
             });
             setAmount("");
             setQuantity("");
@@ -230,8 +237,10 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
     { name: "name", label: "Name", type: "text" },
     { name: "mobile", label: "Mobile", type: "text" },
     { name: "itemName", label: "Item Name", type: "text" },
-    { name: "price", label: "Price", type: "number" },
+    { name: "quantity", label: "Quantity", type: "number" },
+    { name: "amount", label: "Amount", type: "number" },
   ],
+  inventoryEntry: true,
   getRowId: (item) => item.id,
   search: (item, q) =>
     item.name.toLowerCase().includes(q) || item.mobileNumber.toLowerCase().includes(q),
@@ -246,13 +255,20 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
     });
 
     const itemName = values.itemName?.trim();
-    const price = Number(values.price);
-    if (itemName && Number.isFinite(price) && price > 0) {
+    const amount = Number(values.amount);
+    if (itemName && Number.isFinite(amount) && amount > 0) {
       await createTransaction({
         partyId: createdParty.id,
         type: "credit",
+        category: values.inventoryUnit ? "item" : "other",
         title: itemName,
-        amount: price,
+        amount,
+        ...(values.inventoryUnit
+          ? {
+              quantity: Number(values.quantity),
+              unit: values.inventoryUnit,
+            }
+          : {}),
       });
     }
   },

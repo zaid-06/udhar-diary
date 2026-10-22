@@ -49,6 +49,7 @@ export type EntityConfig<TItem, TDetails = unknown> = {
   addLabel: string;
   columns: EntityColumnConfig<TItem>[];
   formFields: EntityFieldConfig[];
+  inventoryEntry?: boolean;
   getRowId: (item: TItem) => string | number;
   search: (item: TItem, query: string) => boolean;
   list: (ctx: EntityPageContext) => Promise<TItem[]>;
