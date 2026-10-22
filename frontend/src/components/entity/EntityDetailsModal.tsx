@@ -57,7 +57,7 @@ export function EntityDetailsModal<TItem, TDetails>({
                 </Card>
               ) : null}
               {config.renderEntry ? (
-                <Card className="rounded-2xl border border-border/70">
+                <Card className="relative z-20 overflow-visible rounded-2xl border border-border/70">
                   <CardContent className="p-4">
                     {config.renderEntry(item, details, {
                       reload: onReload,
