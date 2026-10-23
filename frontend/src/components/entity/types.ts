@@ -50,6 +50,7 @@ export type EntityConfig<TItem, TDetails = unknown> = {
   columns: EntityColumnConfig<TItem>[];
   formFields: EntityFieldConfig[];
   inventoryEntry?: boolean;
+  inventoryProduct?: boolean;
   getRowId: (item: TItem) => string | number;
   search: (item: TItem, query: string) => boolean;
   list: (ctx: EntityPageContext) => Promise<TItem[]>;

@@ -128,6 +128,7 @@ export function EntityPage<TItem, TDetails>({
         title={config.addLabel}
         fields={config.formFields}
         inventoryEntry={config.inventoryEntry}
+        inventoryProduct={config.inventoryProduct}
         inventoryBusinessId={activeBusinessId}
         onSubmit={async (values) => {
           await config.create(context, values);

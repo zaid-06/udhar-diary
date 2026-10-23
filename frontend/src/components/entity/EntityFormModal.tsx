@@ -14,6 +14,7 @@ type EntityFormModalProps = {
   title: string;
   fields: EntityFieldConfig[];
   inventoryEntry?: boolean;
+  inventoryProduct?: boolean;
   inventoryBusinessId?: string | null;
   onSubmit: (values: Record<string, string>) => Promise<void>;
 };
@@ -24,6 +25,7 @@ export function EntityFormModal({
   title,
   fields,
   inventoryEntry = false,
+  inventoryProduct = false,
   inventoryBusinessId,
   onSubmit,
 }: EntityFormModalProps) {
@@ -43,7 +45,7 @@ export function EntityFormModal({
 
   useEffect(() => {
     let cancelled = false;
-    if (!open || !inventoryEntry || !inventoryBusinessId) {
+    if (!open || (!inventoryEntry && !inventoryProduct) || !inventoryBusinessId) {
       setInventory([]);
       return;
     }
@@ -59,14 +61,16 @@ export function EntityFormModal({
     return () => {
       cancelled = true;
     };
-  }, [open, inventoryEntry, inventoryBusinessId]);
+  }, [open, inventoryEntry, inventoryProduct, inventoryBusinessId]);
 
   const getFieldValue = (field: EntityFieldConfig) =>
     values[field.name] ?? (field.type === "select" ? field.options?.[0]?.value ?? "" : "");
 
   const itemName = values.itemName ?? "";
+  const productName = values.productName ?? "";
+  const suggestionQuery = inventoryProduct ? productName : itemName;
   const matchingProducts = useMemo(() => {
-    const query = itemName.trim().toLocaleLowerCase();
+    const query = suggestionQuery.trim().toLocaleLowerCase();
     if (!query) return [];
     const uniqueNames = new Set<string>();
     return inventory
@@ -77,7 +81,7 @@ export function EntityFormModal({
         uniqueNames.add(normalizedName);
         return true;
       });
-  }, [inventory, itemName]);
+  }, [inventory, suggestionQuery]);
 
   const quantity = Number(values.quantity);
   const calculatedAmount = selectedProduct && values.quantity?.trim() && Number.isFinite(quantity) && quantity > 0
@@ -92,6 +96,15 @@ export function EntityFormModal({
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    const exactExistingProduct = inventoryProduct
+      ? inventory.find((product) => product.productName.trim().toLocaleLowerCase() === productName.trim().toLocaleLowerCase())
+      : undefined;
+    if (exactExistingProduct && selectedProduct?.id !== exactExistingProduct.id) {
+      toast.error("Select the existing product from the suggestions.");
+      setSuggestionsOpen(true);
+      return;
+    }
+
     const nextValues = fields.reduce<Record<string, string>>((acc, field) => {
       acc[field.name] = getFieldValue(field);
       return acc;
@@ -99,6 +112,10 @@ export function EntityFormModal({
     if (selectedProduct && itemName.trim().toLocaleLowerCase() === selectedProduct.productName.trim().toLocaleLowerCase()) {
       nextValues.amount = calculatedAmount ?? values.amount ?? "";
       nextValues.inventoryUnit = selectedProduct.unit;
+    }
+    if (inventoryProduct && selectedProduct && productName.trim().toLocaleLowerCase() === selectedProduct.productName.trim().toLocaleLowerCase()) {
+      nextValues.inventoryId = selectedProduct.id;
+      nextValues.inventoryQuantity = String(selectedProduct.quantity);
     }
 
     setSubmitting(true);
@@ -123,6 +140,59 @@ export function EntityFormModal({
         <form className="space-y-3" onSubmit={handleSubmit}>
           {fields.map((field) => {
             if (inventoryEntry && ["quantity", "amount"].includes(field.name)) return null;
+
+            if (inventoryProduct && field.name === "productName") {
+              return (
+                <div key={field.name} className="space-y-1">
+                  <Label htmlFor={`entity-field-${field.name}`}>{field.label}</Label>
+                  <div className="relative">
+                    <Input
+                      id={`entity-field-${field.name}`}
+                      type="text"
+                      placeholder={field.placeholder}
+                      value={productName}
+                      onFocus={() => setSuggestionsOpen(true)}
+                      onChange={(event) => {
+                        setValues((previous) => ({ ...previous, productName: event.target.value }));
+                        setSelectedProduct(undefined);
+                        setSuggestionsOpen(true);
+                      }}
+                      onBlur={() => window.setTimeout(() => setSuggestionsOpen(false), 100)}
+                      disabled={submitting}
+                      required
+                    />
+                    {suggestionsOpen && matchingProducts.length > 0 ? (
+                      <ul role="listbox" aria-label="Existing inventory products" className="absolute inset-x-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
+                        {matchingProducts.map((name) => (
+                          <li key={name} role="option">
+                            <button
+                              type="button"
+                              className="w-full rounded-sm px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                              onMouseDown={(event) => event.preventDefault()}
+                              onClick={() => {
+                                const product = inventory.find((entry) => entry.productName.trim().toLocaleLowerCase() === name.toLocaleLowerCase());
+                                if (!product) return;
+                                setValues((previous) => ({
+                                  ...previous,
+                                  productName: product.productName,
+                                  unit: product.unit,
+                                  purchasePrice: String(product.purchasePrice),
+                                  sellingPrice: String(product.sellingPrice),
+                                }));
+                                setSelectedProduct(product);
+                                setSuggestionsOpen(false);
+                              }}
+                            >
+                              {name}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            }
 
             if (inventoryEntry && field.name === "itemName") {
               return (
@@ -224,6 +294,9 @@ export function EntityFormModal({
                   value={values[field.name] ?? ""}
                   onChange={(event) => setValues((prev) => ({ ...prev, [field.name]: event.target.value }))}
                   disabled={submitting}
+                  required={inventoryProduct && ["quantity", "purchasePrice", "sellingPrice"].includes(field.name)}
+                  min={inventoryProduct && field.name === "quantity" ? "0.000001" : undefined}
+                  step={inventoryProduct && field.name === "quantity" ? "any" : undefined}
                 />
               )}
             </div>

@@ -6,6 +6,7 @@ import {
   deleteInventory,
   defaultInventoryUnitOptions,
   fetchInventory,
+  updateInventory,
   type InventoryItem,
 } from "./api";
 
@@ -54,17 +55,34 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
     { name: "purchasePrice", label: "Purchase Price", type: "number" },
     { name: "sellingPrice", label: "Selling Price", type: "number" },
   ],
+  inventoryProduct: true,
   getRowId: (item) => item.id,
   search: (item, q) => item.productName.toLowerCase().includes(q),
   list: async (ctx) => fetchInventory(ctx.categoryId),
   create: async (ctx, values) => {
+    const quantity = Number(values.quantity || 0);
+    const unit = values.unit || "pcs";
+    const purchasePrice = Number(values.purchasePrice || 0);
+    const sellingPrice = Number(values.sellingPrice || 0);
+
+    if (values.inventoryId) {
+      await updateInventory(values.inventoryId, {
+        productName: values.productName,
+        quantity: Number(values.inventoryQuantity || 0) + quantity,
+        unit,
+        purchasePrice,
+        sellingPrice,
+      });
+      return;
+    }
+
     await createInventory({
       categoryId: ctx.categoryId,
       productName: values.productName,
-      quantity: Number(values.quantity || 0),
-      unit: values.unit || "pcs",
-      purchasePrice: Number(values.purchasePrice || 0),
-      sellingPrice: Number(values.sellingPrice || 0),
+      quantity,
+      unit,
+      purchasePrice,
+      sellingPrice,
     });
   },
   details: {
