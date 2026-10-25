@@ -244,6 +244,12 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
   getRowId: (item) => item.id,
   search: (item, q) =>
     item.name.toLowerCase().includes(q) || item.mobileNumber.toLowerCase().includes(q),
+  sortOptions: [
+    { value: "recent", label: "Most recent", compare: (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt) },
+    { value: "amount-high", label: "Highest amount", compare: (left, right) => Number(right.totalAmount) - Number(left.totalAmount) },
+    { value: "amount-low", label: "Lowest amount", compare: (left, right) => Number(left.totalAmount) - Number(right.totalAmount) },
+    { value: "name", label: "Name A–Z", compare: (left, right) => left.name.localeCompare(right.name) },
+  ],
   list: async (ctx) => fetchCustomers(ctx.categoryId),
   create: async (ctx, values) => {
     const categoryType = ctx.activeBusiness?.type ?? "shop";

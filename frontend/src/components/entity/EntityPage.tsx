@@ -1,5 +1,6 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -7,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Header } from "@/layout/Header";
 import type { AppLayoutContext } from "@/layout/AppLayout";
 import { EntityToolbar } from "./EntityToolbar";
 import { EntityFormModal } from "./EntityFormModal";
@@ -32,19 +32,20 @@ export function EntityPage<TItem, TDetails>({
   beforeCard,
 }: EntityPageProps<TItem, TDetails>) {
   const {
-    businesses,
     activeBusinessId,
     activeBusiness,
-    onSwitchBusiness,
-    onOpenCreateBusiness,
   } = useOutletContext<AppLayoutContext>();
 
   const [rows, setRows] = useState<TItem[]>([]);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState(config.sortOptions?.[0]?.value ?? "");
   const [openAdd, setOpenAdd] = useState(false);
   const [selected, setSelected] = useState<TItem | null>(null);
   const [details, setDetails] = useState<TDetails | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(true);
+  const [listBusinessId, setListBusinessId] = useState<string | null>(null);
+  const listRequestId = useRef(0);
 
   const context = useMemo(
     () => ({
@@ -55,13 +56,31 @@ export function EntityPage<TItem, TDetails>({
   );
 
   const loadList = async () => {
-    if (!activeBusinessId) return;
-    const data = await config.list(context);
-    setRows(data);
+    const requestId = ++listRequestId.current;
+    if (!activeBusinessId) {
+      setRows([]);
+      setListBusinessId(null);
+      setListLoading(false);
+      return;
+    }
+
+    setListLoading(true);
+    try {
+      const data = await config.list(context);
+      if (requestId === listRequestId.current) setRows(data);
+    } finally {
+      if (requestId === listRequestId.current) {
+        setListBusinessId(activeBusinessId);
+        setListLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
     void loadList();
+    return () => {
+      listRequestId.current += 1;
+    };
   }, [activeBusinessId]);
 
   const filteredRows = useMemo(() => {
@@ -69,6 +88,11 @@ export function EntityPage<TItem, TDetails>({
     if (!q) return rows;
     return rows.filter((row) => config.search(row, q));
   }, [rows, search, config]);
+
+  const sortedRows = useMemo(() => {
+    const comparator = config.sortOptions?.find((option) => option.value === sortBy)?.compare;
+    return comparator ? [...filteredRows].sort(comparator) : filteredRows;
+  }, [filteredRows, config, sortBy]);
 
   const openDetails = async (item: TItem) => {
     setSelected(item);
@@ -89,17 +113,12 @@ export function EntityPage<TItem, TDetails>({
 
   return (
     <div className="space-y-4">
-      <Header
-        businesses={businesses}
-        activeBusinessId={activeBusinessId}
-        activeModule={config.module}
-        onSwitchBusiness={onSwitchBusiness}
-        onCreateBusiness={onOpenCreateBusiness}
-      />
-
       <EntityToolbar
         searchValue={search}
         onSearchChange={setSearch}
+        sortValue={sortBy}
+        sortOptions={config.sortOptions ?? []}
+        onSortChange={setSortBy}
         addLabel={config.addLabel}
         onAddClick={() => setOpenAdd(true)}
         extraActions={resolvedToolbarExtra}
@@ -113,12 +132,19 @@ export function EntityPage<TItem, TDetails>({
           <CardDescription>{config.subtitle}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <EntityTable
-            rows={filteredRows}
-            columns={config.columns}
-            onRowClick={openDetails}
-            onReload={loadList}
-          />
+          {listLoading || listBusinessId !== activeBusinessId ? (
+            <div className="flex min-h-40 items-center justify-center" role="status" aria-live="polite">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" aria-hidden="true" />
+              <span className="sr-only">Loading {config.title.toLowerCase()}</span>
+            </div>
+          ) : (
+            <EntityTable
+              rows={sortedRows}
+              columns={config.columns}
+              onRowClick={openDetails}
+              onReload={loadList}
+            />
+          )}
         </CardContent>
       </Card>
 

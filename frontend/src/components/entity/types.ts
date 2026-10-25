@@ -18,6 +18,12 @@ export type EntityColumnConfig<TItem> = {
   render?: (item: TItem, actions: { reload: () => Promise<void> }) => ReactNode;
 };
 
+export type EntitySortOption<TItem> = {
+  value: string;
+  label: string;
+  compare: (left: TItem, right: TItem) => number;
+};
+
 export type EntityPageContext = {
   categoryId: string;
   activeBusiness: Category | null;
@@ -53,6 +59,7 @@ export type EntityConfig<TItem, TDetails = unknown> = {
   inventoryProduct?: boolean;
   getRowId: (item: TItem) => string | number;
   search: (item: TItem, query: string) => boolean;
+  sortOptions?: EntitySortOption<TItem>[];
   list: (ctx: EntityPageContext) => Promise<TItem[]>;
   create: (ctx: EntityPageContext, values: Record<string, string>) => Promise<void>;
   details: EntityDetailsConfig<TItem, TDetails>;

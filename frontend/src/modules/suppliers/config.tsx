@@ -74,6 +74,12 @@ export const suppliersConfig: EntityConfig<Supplier, SupplierDetails> = {
   ],
   getRowId: (item) => item.id,
   search: (item, q) => item.name.toLowerCase().includes(q) || item.mobile.toLowerCase().includes(q),
+  sortOptions: [
+    { value: "recent", label: "Most recent", compare: (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt) },
+    { value: "balance-high", label: "Highest balance", compare: (left, right) => Number(right.outstandingBalance) - Number(left.outstandingBalance) },
+    { value: "balance-low", label: "Lowest balance", compare: (left, right) => Number(left.outstandingBalance) - Number(right.outstandingBalance) },
+    { value: "name", label: "Name A–Z", compare: (left, right) => left.name.localeCompare(right.name) },
+  ],
   list: async (ctx) => fetchSuppliers(ctx.categoryId),
   create: async (ctx, values) => {
     await createSupplier({

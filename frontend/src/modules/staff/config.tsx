@@ -60,6 +60,12 @@ export const staffConfig: EntityConfig<StaffMember, StaffDetails> = {
     item.name.toLowerCase().includes(q) ||
     item.mobile.toLowerCase().includes(q) ||
     item.role.toLowerCase().includes(q),
+  sortOptions: [
+    { value: "recent", label: "Most recent", compare: (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt) },
+    { value: "salary-high", label: "Highest salary", compare: (left, right) => Number(right.salary) - Number(left.salary) },
+    { value: "salary-low", label: "Lowest salary", compare: (left, right) => Number(left.salary) - Number(right.salary) },
+    { value: "name", label: "Name A–Z", compare: (left, right) => left.name.localeCompare(right.name) },
+  ],
   list: async (ctx) => fetchStaff(ctx.categoryId),
   create: async (ctx, values) => {
     await createStaff({

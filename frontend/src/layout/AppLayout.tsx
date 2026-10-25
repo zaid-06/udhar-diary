@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Sidebar } from "@/layout/Sidebar";
+import { Header } from "@/layout/Header";
 import { Button } from "@/components/ui/button";
 import { BusinessModal } from "@/components/dashboard/BusinessModal";
 import { BusinessDetailsDialog } from "@/components/dashboard/BusinessDetailsDialog";
@@ -155,6 +156,15 @@ export function AppLayout() {
           <Button variant="outline" size="icon-sm" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar">
             <Menu className="size-4" />
           </Button>
+        </div>
+        <div className="mb-4">
+          <Header
+            businesses={businesses}
+            activeBusinessId={activeBusinessId}
+            activeModule={activeModule}
+            onSwitchBusiness={onSwitchBusiness}
+            onCreateBusiness={() => setBusinessModalOpen(true)}
+          />
         </div>
         <Outlet context={contextValue} />
       </main>

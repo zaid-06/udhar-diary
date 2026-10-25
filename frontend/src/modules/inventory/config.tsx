@@ -58,6 +58,14 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
   inventoryProduct: true,
   getRowId: (item) => item.id,
   search: (item, q) => item.productName.toLowerCase().includes(q),
+  sortOptions: [
+    { value: "recent", label: "Most recent", compare: (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt) },
+    { value: "quantity-high", label: "Highest quantity", compare: (left, right) => Number(right.quantity) - Number(left.quantity) },
+    { value: "quantity-low", label: "Lowest quantity", compare: (left, right) => Number(left.quantity) - Number(right.quantity) },
+    { value: "price-high", label: "Highest price", compare: (left, right) => Number(right.purchasePrice) - Number(left.purchasePrice) },
+    { value: "price-low", label: "Lowest price", compare: (left, right) => Number(left.purchasePrice) - Number(right.purchasePrice) },
+    { value: "name", label: "Name A–Z", compare: (left, right) => left.productName.localeCompare(right.productName) },
+  ],
   list: async (ctx) => fetchInventory(ctx.categoryId),
   create: async (ctx, values) => {
     const quantity = Number(values.quantity || 0);

@@ -27,17 +27,24 @@ function BusinessEntryRedirect() {
 
 export function BusinessRoutes() {
   return (
-    <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading module...</div>}>
-      <Routes>
-        <Route path="/dashboard" element={<BusinessEntryRedirect />} />
-        <Route element={<AppLayout />}>
-          <Route path="/business/:businessId/customers" element={<CustomersPage />} />
-          <Route path="/business/:businessId/inventory" element={<InventoryPage />} />
-          <Route path="/business/:businessId/suppliers" element={<SuppliersPage />} />
-          <Route path="/business/:businessId/staff" element={<StaffPage />} />
-        </Route>
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route path="/dashboard" element={<BusinessEntryRedirect />} />
+      <Route element={<AppLayout />}>
+        <Route path="/business/:businessId/customers" element={<Suspense fallback={<ModuleLoading />}><CustomersPage /></Suspense>} />
+        <Route path="/business/:businessId/inventory" element={<Suspense fallback={<ModuleLoading />}><InventoryPage /></Suspense>} />
+        <Route path="/business/:businessId/suppliers" element={<Suspense fallback={<ModuleLoading />}><SuppliersPage /></Suspense>} />
+        <Route path="/business/:businessId/staff" element={<Suspense fallback={<ModuleLoading />}><StaffPage /></Suspense>} />
+      </Route>
+    </Routes>
+  );
+}
+
+function ModuleLoading() {
+  return (
+    <div className="flex min-h-64 items-center justify-center" role="status" aria-live="polite">
+      <span className="sr-only">Loading module</span>
+      <span className="size-7 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-primary" aria-hidden="true" />
+    </div>
   );
 }
 

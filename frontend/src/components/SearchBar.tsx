@@ -11,7 +11,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       placeholder="Search by name or mobile..."
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="h-9 w-full sm:max-w-sm"
+      className="h-9 w-full sm:max-w-56"
     />
   );
 }
