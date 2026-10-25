@@ -35,17 +35,24 @@ export const inventoryConfig: EntityConfig<InventoryItem, null> = {
       key: "lowStock",
       label: "Stock Status",
       className: "pr-6 text-right",
-      render: (item) => (
-        <span
-          className={
-            item.lowStock
-              ? "text-red-600 text-xs font-medium"
-              : "text-green-600 text-xs font-medium"
-          }
-        >
-          {item.lowStock ? "Low" : "Healthy"}
-        </span>
-      ),
+      render: (item) => {
+        const outOfStock = item.quantity <= 0;
+        const lowStock = !outOfStock && item.lowStock;
+
+        return (
+          <span
+            className={
+              outOfStock
+                ? "text-red-600 text-xs font-medium"
+                : lowStock
+                  ? "text-orange-500 text-xs font-medium"
+                  : "text-green-600 text-xs font-medium"
+            }
+          >
+            {outOfStock ? "Out of stock" : lowStock ? "Low" : "Healthy"}
+          </span>
+        );
+      },
     },
   ],
   formFields: [
