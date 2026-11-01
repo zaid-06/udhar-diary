@@ -128,7 +128,7 @@ export function EntityPage<TItem, TDetails>({
 
       <Card className="border-0 shadow-md ring-1 ring-border/60">
         <CardHeader className="border-b border-border/60 bg-card pb-0">
-          <CardTitle>{config.title}</CardTitle>
+          <CardTitle className="text-primary">{config.title}</CardTitle>
           <CardDescription>{config.subtitle}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">

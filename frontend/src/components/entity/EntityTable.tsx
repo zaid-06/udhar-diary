@@ -14,7 +14,7 @@ export function EntityTable<TItem>({ rows, columns, onRowClick, onReload }: Enti
       <TableHeader>
         <TableRow>
           {columns.map((column) => (
-            <TableHead key={column.key} className={column.className}>
+            <TableHead key={column.key} className={`font-semibold text-primary ${column.className ?? ""}`}>
               {column.label}
             </TableHead>
           ))}

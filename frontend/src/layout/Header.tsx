@@ -51,7 +51,7 @@ export function Header({
                 navigate(`/business/${activeBusinessId}/${module.key}`);
               }}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
-                isActive ? "bg-background text-primary shadow-sm" : "text-primary-foreground/85 hover:bg-primary-foreground/15"
+                isActive ? "bg-black text-white shadow-sm" : "text-primary-foreground/85 hover:bg-primary-foreground/15"
               }`}
             >
               {module.label}
