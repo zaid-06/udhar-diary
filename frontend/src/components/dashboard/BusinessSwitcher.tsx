@@ -41,14 +41,14 @@ export function BusinessSwitcher({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex w-fit items-center gap-1 rounded-md px-1 py-1 text-left text-2xl font-bold tracking-tight text-foreground transition-colors hover:bg-muted/60 hover:text-primary"
+        className="inline-flex w-fit items-center gap-1 rounded-md px-1 py-1 text-left text-2xl font-bold tracking-tight text-primary-foreground transition-colors hover:bg-primary-foreground/10"
       >
         <span>{activeBusiness?.name ?? "Select a business from sidebar"}</span>
-        <ChevronDown className="size-4 text-muted-foreground" />
+        <ChevronDown className="size-4 text-primary-foreground/75" />
       </button>
 
       {open ? (
-        <div className="absolute left-0 top-[calc(100%+8px)] z-40 w-[320px] rounded-2xl border border-border/60 bg-card/95 p-2 shadow-2xl backdrop-blur">
+        <div className="absolute left-0 top-[calc(100%+8px)] z-40 w-[320px] rounded-2xl border border-border/60 bg-card/95 p-2 text-card-foreground shadow-2xl backdrop-blur">
           <div className="max-h-80 space-y-1 overflow-auto pr-1">
             {businesses.map((business) => {
               const isActive = business.id === activeBusinessId;

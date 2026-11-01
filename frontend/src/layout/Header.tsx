@@ -29,7 +29,7 @@ export function Header({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-card p-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/20 bg-primary p-3 text-primary-foreground shadow-sm">
       <BusinessSwitcher
         businesses={businesses}
         activeBusinessId={activeBusinessId}
@@ -39,7 +39,7 @@ export function Header({
         }}
         onCreateBusiness={onCreateBusiness}
       />
-      <div className="flex items-center gap-1 rounded-xl border border-border/60 bg-muted/40 p-1">
+      <div className="flex items-center gap-1 rounded-xl border border-primary-foreground/20 bg-primary-foreground/10 p-1">
         {MODULES.map((module) => {
           const isActive = module.key === activeModule;
           return (
@@ -51,7 +51,7 @@ export function Header({
                 navigate(`/business/${activeBusinessId}/${module.key}`);
               }}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
-                isActive ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:bg-background/70"
+                isActive ? "bg-background text-primary shadow-sm" : "text-primary-foreground/85 hover:bg-primary-foreground/15"
               }`}
             >
               {module.label}

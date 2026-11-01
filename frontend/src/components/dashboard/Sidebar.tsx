@@ -95,7 +95,7 @@ export function Sidebar({
           ) : null}
           <button
             type="button"
-            className={`flex w-full items-center rounded-lg bg-primary/10 text-left text-sm font-medium text-primary ${
+            className={`flex w-full items-center rounded-lg bg-sidebar-accent text-left text-sm font-medium text-sidebar-accent-foreground ${
               isCollapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2"
             }`}
             onClick={onNavigateDashboard}
@@ -156,7 +156,7 @@ export function Sidebar({
                       <div
                         key={business.id}
                         className={`flex w-full items-center rounded-lg text-left text-sm transition-colors ${
-                          isActive ? "bg-primary/10 font-medium text-primary" : "hover:bg-muted/80"
+                          isActive ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground" : "hover:bg-muted/80"
                         } gap-2 px-2 py-1.5`}
                       >
                         <button

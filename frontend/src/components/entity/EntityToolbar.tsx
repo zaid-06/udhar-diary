@@ -26,7 +26,7 @@ export function EntityToolbar({
 }: EntityToolbarProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex w-full min-w-0 flex-1 items-center gap-2">
         <SearchBar value={searchValue} onChange={onSearchChange} />
         {sortOptions.length > 0 ? (
           <div className="flex h-9 items-center gap-1">
