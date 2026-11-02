@@ -27,6 +27,7 @@ function CustomerEntrySection({
   const [amount, setAmount] = useState("");
   const [quantity, setQuantity] = useState("");
   const [title, setTitle] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState<"paid" | "unpaid">("unpaid");
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
@@ -145,7 +146,7 @@ function CustomerEntrySection({
           </ul>
         ) : null}
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Input
           type="number"
           min="0"
@@ -165,6 +166,15 @@ function CustomerEntrySection({
           readOnly={Boolean(selectedProduct)}
           onChange={(event) => setAmount(event.target.value)}
         />
+        <select
+          aria-label="Payment status"
+          value={paymentStatus}
+          onChange={(event) => setPaymentStatus(event.target.value as "paid" | "unpaid")}
+          className="h-9 min-w-28 rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <option value="unpaid">Unpaid</option>
+          <option value="paid">Paid</option>
+        </select>
         <Button
           onClick={async () => {
             const numeric = Number(displayedAmount);
@@ -175,6 +185,7 @@ function CustomerEntrySection({
               category: selectedProduct ? "item" : "other",
               title: title || "Entry",
               amount: numeric,
+              paymentStatus,
               ...(selectedProduct
                 ? {
                     quantity: numericQuantity,
@@ -316,6 +327,13 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
                 <p className="font-medium">{tx.title}</p>
                 <p className="text-xs text-muted-foreground">{formatDateTime(tx.createdAt)}</p>
               </div>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                tx.paymentStatus === "paid"
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+              }`}>
+                {tx.paymentStatus === "paid" ? "Paid" : "Unpaid"}
+              </span>
               <p className={tx.type === "credit" ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
                 {tx.type === "debit" ? "-" : "+"}
                 {formatInr(Number(tx.amount))}

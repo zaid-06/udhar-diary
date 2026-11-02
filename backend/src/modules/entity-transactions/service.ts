@@ -27,7 +27,10 @@ const createTransaction = async (
   const entity = await getOwnedEntity(ownerId, input.entityId);
   if (!entity) return { status: "entity_not_found" as const };
 
-  const delta = input.type === "credit" ? input.amount : -input.amount;
+  const paymentStatus = input.paymentStatus ?? (input.type === "debit" ? "paid" : "unpaid");
+  const delta = input.type === "credit"
+    ? paymentStatus === "paid" ? 0 : input.amount
+    : -input.amount;
   const nextTotal = entity.totalAmount + delta;
   if (nextTotal < 0) {
     return {
@@ -48,6 +51,7 @@ const createTransaction = async (
         unit: input.unit,
         metadata: input.metadata,
         type: input.type,
+        paymentStatus,
       })
       .returning();
 
@@ -95,6 +99,7 @@ const getByEntity = async (authUser: AuthUserContext, entityId: string) => {
       unit: entityTransactions.unit,
       metadata: entityTransactions.metadata,
       type: entityTransactions.type,
+      paymentStatus: entityTransactions.paymentStatus,
       createdAt: entityTransactions.createdAt,
     })
     .from(entityTransactions)
@@ -113,6 +118,7 @@ const deleteTransaction = async (
       entityId: entityTransactions.entityId,
       amount: sql<number>`${entityTransactions.amount}::float8`,
       type: entityTransactions.type,
+      paymentStatus: entityTransactions.paymentStatus,
     })
     .from(entityTransactions)
     .innerJoin(entities, eq(entities.id, entityTransactions.entityId))
@@ -131,7 +137,9 @@ const deleteTransaction = async (
     await tx
       .delete(entityTransactions)
       .where(eq(entityTransactions.id, transactionId));
-    const reverseDelta = row.type === "credit" ? -row.amount : row.amount;
+    const reverseDelta = row.type === "credit"
+      ? row.paymentStatus === "paid" ? 0 : -row.amount
+      : row.amount;
     await tx
       .update(entities)
       .set({

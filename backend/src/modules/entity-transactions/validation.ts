@@ -19,6 +19,7 @@ export const createEntityTransactionSchema = z.object({
   unit: z.string().trim().min(1).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
   type: z.enum(["credit", "debit"]),
+  paymentStatus: z.enum(["paid", "unpaid"]).optional(),
 });
 
 export const entityIdQuerySchema = z.object({

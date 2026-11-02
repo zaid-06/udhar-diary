@@ -15,6 +15,7 @@ export type CreateTransactionInput = {
   quantity?: number;
   unit?: string;
   metadata?: Record<string, unknown>;
+  paymentStatus?: "paid" | "unpaid";
 };
 
 export type Transaction = {
@@ -27,6 +28,7 @@ export type Transaction = {
   quantity?: number | null;
   unit?: string | null;
   metadata?: Record<string, unknown> | null;
+  paymentStatus: "paid" | "unpaid";
   createdAt: string;
 };
 
@@ -39,7 +41,10 @@ export async function createTransaction(input: CreateTransactionInput) {
     amount: input.amount,
     quantity: input.quantity,
     unit: input.unit,
-    metadata: input.metadata,
+    metadata: input.paymentStatus
+      ? { ...input.metadata, paymentStatus: input.paymentStatus }
+      : input.metadata,
+    paymentStatus: input.paymentStatus,
   });
   return data.data;
 }
@@ -55,6 +60,7 @@ export async function fetchTransactionsByParty(partyId: string): Promise<Transac
     quantity?: number | null;
     unit?: string | null;
     metadata?: Record<string, unknown> | null;
+    paymentStatus?: "paid" | "unpaid";
     createdAt: string;
   }>>>("/v1/transactions", { params: { entityId: partyId } });
 
@@ -68,6 +74,10 @@ export async function fetchTransactionsByParty(partyId: string): Promise<Transac
     quantity: row.quantity,
     unit: row.unit,
     metadata: row.metadata,
+    paymentStatus:
+      row.metadata?.paymentStatus === "paid" || row.metadata?.paymentStatus === "unpaid"
+        ? row.metadata.paymentStatus
+        : row.paymentStatus ?? "unpaid",
     createdAt: row.createdAt,
   }));
 }
@@ -77,6 +87,7 @@ export async function createPaymentTransaction(partyId: string, amount: number) 
     entityId: partyId,
     type: "debit",
     category: "payment",
+    paymentStatus: "paid",
     title: "Payment received",
     amount,
   });

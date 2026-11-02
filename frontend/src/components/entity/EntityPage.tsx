@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -18,6 +19,7 @@ import { type EntityConfig } from "./types";
 type EntityPageProps<TItem, TDetails> = {
   config: EntityConfig<TItem, TDetails>;
   toolbarExtra?: ReactNode | ((ctx: EntityToolbarExtraContext) => ReactNode);
+  headerExtra?: ReactNode | ((items: TItem[]) => ReactNode);
   beforeCard?: ReactNode;
 };
 
@@ -29,6 +31,7 @@ export type EntityToolbarExtraContext = {
 export function EntityPage<TItem, TDetails>({
   config,
   toolbarExtra,
+  headerExtra,
   beforeCard,
 }: EntityPageProps<TItem, TDetails>) {
   const {
@@ -110,6 +113,8 @@ export function EntityPage<TItem, TDetails>({
     typeof toolbarExtra === "function"
       ? toolbarExtra({ businessId: activeBusinessId, reloadList: loadList })
       : toolbarExtra;
+  const resolvedHeaderExtra =
+    typeof headerExtra === "function" ? headerExtra(rows) : headerExtra;
 
   return (
     <div className="space-y-4">
@@ -130,6 +135,9 @@ export function EntityPage<TItem, TDetails>({
         <CardHeader className="border-b border-border/60 bg-card pb-0">
           <CardTitle className="text-primary">{config.title}</CardTitle>
           <CardDescription>{config.subtitle}</CardDescription>
+          {resolvedHeaderExtra ? (
+            <CardAction className="text-right">{resolvedHeaderExtra}</CardAction>
+          ) : null}
         </CardHeader>
         <CardContent className="p-0">
           {listLoading || listBusinessId !== activeBusinessId ? (
