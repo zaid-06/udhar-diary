@@ -15,7 +15,7 @@ export type CreateTransactionInput = {
   quantity?: number;
   unit?: string;
   metadata?: Record<string, unknown>;
-  paymentStatus?: "paid" | "unpaid";
+  paymentStatus?: "paid" | "unpaid" | "partial";
 };
 
 export type Transaction = {
@@ -28,7 +28,7 @@ export type Transaction = {
   quantity?: number | null;
   unit?: string | null;
   metadata?: Record<string, unknown> | null;
-  paymentStatus: "paid" | "unpaid";
+  paymentStatus: "paid" | "unpaid" | "partial";
   createdAt: string;
 };
 
@@ -60,7 +60,7 @@ export async function fetchTransactionsByParty(partyId: string): Promise<Transac
     quantity?: number | null;
     unit?: string | null;
     metadata?: Record<string, unknown> | null;
-    paymentStatus?: "paid" | "unpaid";
+    paymentStatus?: "paid" | "unpaid" | "partial";
     createdAt: string;
   }>>>("/v1/transactions", { params: { entityId: partyId } });
 
@@ -75,7 +75,7 @@ export async function fetchTransactionsByParty(partyId: string): Promise<Transac
     unit: row.unit,
     metadata: row.metadata,
     paymentStatus:
-      row.metadata?.paymentStatus === "paid" || row.metadata?.paymentStatus === "unpaid"
+      row.metadata?.paymentStatus === "paid" || row.metadata?.paymentStatus === "unpaid" || row.metadata?.paymentStatus === "partial"
         ? row.metadata.paymentStatus
         : row.paymentStatus ?? "unpaid",
     createdAt: row.createdAt,

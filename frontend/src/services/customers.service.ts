@@ -8,6 +8,7 @@ export type Customer = {
   reminderEnabled: boolean;
   createdAt: string;
   totalAmount: number;
+  unpaidAmount: number;
 };
 
 const mapPartyToCustomer = (party: Party): Customer => ({
@@ -17,6 +18,7 @@ const mapPartyToCustomer = (party: Party): Customer => ({
   reminderEnabled: party.reminderEnabled,
   createdAt: party.createdAt,
   totalAmount: party.totalAmount,
+  unpaidAmount: party.unpaidAmount,
 });
 
 export async function fetchCustomers(categoryId: string): Promise<Customer[]> {

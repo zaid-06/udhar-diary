@@ -15,6 +15,7 @@ export type Party = {
   mobile: string;
   type: PartyType;
   totalAmount: number;
+  unpaidAmount: number;
   reminderEnabled: boolean;
   createdAt: string;
 };
@@ -36,6 +37,7 @@ export async function fetchPartiesByCategory(categoryId: string): Promise<Party[
     mobile: string;
     category: PartyType;
     totalAmount: number;
+    unpaidAmount?: number;
     reminderEnabled: boolean;
     createdAt: string;
   }>>>("/v1/entities", {
@@ -48,6 +50,7 @@ export async function fetchPartiesByCategory(categoryId: string): Promise<Party[
     mobile: row.mobile,
     type: row.category,
     totalAmount: row.totalAmount,
+    unpaidAmount: Number(row.unpaidAmount ?? row.totalAmount ?? 0),
     reminderEnabled: row.reminderEnabled,
     createdAt: row.createdAt,
   }));
@@ -83,6 +86,7 @@ export async function createParty(input: CreatePartyInput): Promise<Party> {
     mobile: data.data.mobile,
     type: data.data.category,
     totalAmount: data.data.totalAmount,
+    unpaidAmount: Number(data.data.totalAmount ?? 0),
     reminderEnabled: data.data.reminderEnabled,
     createdAt: data.data.createdAt,
   };

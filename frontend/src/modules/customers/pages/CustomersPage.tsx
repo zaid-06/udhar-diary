@@ -17,7 +17,7 @@ export default function CustomersPage() {
       config={customerConfig}
       headerExtra={(customers) => {
         const totalUnpaid = customers.reduce(
-          (total, customer) => total + Number(customer.totalAmount || 0),
+          (total, customer) => total + Number(customer.unpaidAmount || 0),
           0,
         );
 

@@ -206,6 +206,57 @@ function CustomerEntrySection({
   );
 }
 
+function CustomerPartialPaymentSection({
+  item,
+  reload,
+}: {
+  item: Customer;
+  reload: () => Promise<void>;
+}) {
+  const [amount, setAmount] = useState("");
+  const numericAmount = Number(amount);
+  const canSubmit = Number.isFinite(numericAmount) && numericAmount > 0;
+
+  return (
+    <div className="space-y-2 border-t border-border/70 pt-4">
+      <div>
+        <p className="text-sm font-semibold">Record Partial Payment</p>
+        <p className="text-xs text-muted-foreground">Enter the amount received from this customer.</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Input
+          type="number"
+          min="0.01"
+          step="0.01"
+          placeholder="Partial amount received"
+          aria-label="Partial amount received"
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
+        />
+        <Button
+          type="button"
+          disabled={!canSubmit}
+          onClick={async () => {
+            if (!canSubmit) return;
+            await createTransaction({
+              partyId: item.id,
+              type: "debit",
+              category: "payment",
+              title: "Partial Payment",
+              amount: numericAmount,
+              paymentStatus: "partial",
+            });
+            setAmount("");
+            await reload();
+          }}
+        >
+          Record Partial Payment
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
   module: "customers",
   title: "Customers",
@@ -330,9 +381,11 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                 tx.paymentStatus === "paid"
                   ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                  : tx.paymentStatus === "partial"
+                    ? "bg-sky-500/10 text-sky-700 dark:text-sky-400"
+                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
               }`}>
-                {tx.paymentStatus === "paid" ? "Paid" : "Unpaid"}
+                {tx.paymentStatus === "paid" ? "Paid" : tx.paymentStatus === "partial" ? "Partial" : "Unpaid"}
               </span>
               <p className={tx.type === "credit" ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
                 {tx.type === "debit" ? "-" : "+"}
@@ -344,7 +397,10 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
       </div>
     ),
     renderEntry: (item, _, { reload }) => (
-      <CustomerEntrySection item={item} reload={reload} />
+      <div className="space-y-4">
+        <CustomerEntrySection item={item} reload={reload} />
+        <CustomerPartialPaymentSection item={item} reload={reload} />
+      </div>
     ),
     renderActionBar: (item, _, { reload, close }) => (
       <div className="flex justify-end">

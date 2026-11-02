@@ -3,6 +3,7 @@ import { db } from "../../db/client.js";
 import {
   businesses,
   entities,
+  entityTransactions,
   entityMemberDetails,
   entityStaffDetails,
   entityStudentDetails,
@@ -140,6 +141,17 @@ const getEntities = async (
       address: entities.address,
       category: entities.category,
       totalAmount: sql<number>`${entities.totalAmount}::float8`,
+      unpaidAmount: sql<number>`COALESCE((
+        SELECT SUM(
+          CASE
+            WHEN ${entityTransactions.paymentStatus} = 'unpaid' THEN ${entityTransactions.amount}
+            WHEN ${entityTransactions.paymentStatus} = 'partial' THEN -${entityTransactions.amount}
+            ELSE 0
+          END
+        )
+        FROM ${entityTransactions}
+        WHERE ${entityTransactions.entityId} = ${entities.id}
+      ), 0)::float8`,
       reminderEnabled: entities.reminderEnabled,
       createdAt: entities.createdAt,
     })

@@ -27,6 +27,11 @@ export const transactionTypeEnum = pgEnum("transaction_type", [
   "credit",
   "debit",
 ]);
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "unpaid",
+  "paid",
+  "partial",
+]);
 export const transactionCategoryEnum = pgEnum("transaction_category", [
   "item",
   "fees",
@@ -135,7 +140,7 @@ export const entityTransactions = pgTable(
     unit: text("unit"),
     metadata: jsonb("metadata"),
     type: transactionTypeEnum("type").notNull(),
-    paymentStatus: text("payment_status").notNull().default("unpaid"),
+    paymentStatus: paymentStatusEnum("payment_status").notNull().default("unpaid"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
