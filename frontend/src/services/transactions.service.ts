@@ -82,13 +82,17 @@ export async function fetchTransactionsByParty(partyId: string): Promise<Transac
   }));
 }
 
-export async function createPaymentTransaction(partyId: string, amount: number) {
+export async function createPaymentTransaction(
+  partyId: string,
+  amount: number,
+  paymentStatus: "paid" | "partial" = "paid",
+) {
   const { data } = await api.post<ApiEnvelope<Transaction>>("/v1/transactions", {
     entityId: partyId,
     type: "debit",
     category: "payment",
-    paymentStatus: "paid",
-    title: "Payment received",
+    paymentStatus,
+    title: paymentStatus === "partial" ? "Partial Payment" : "Payment received",
     amount,
   });
   return data.data;

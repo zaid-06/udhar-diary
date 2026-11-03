@@ -32,7 +32,8 @@ const createTransaction = async (
     ? paymentStatus === "paid" ? 0 : input.amount
     : -input.amount;
   const nextTotal = entity.totalAmount + delta;
-  if (nextTotal < 0) {
+  const isPartialPayment = input.type === "debit" && paymentStatus === "partial";
+  if (nextTotal < 0 && !isPartialPayment) {
     return {
       status: "insufficient_balance" as const,
       currentTotalAmount: entity.totalAmount,

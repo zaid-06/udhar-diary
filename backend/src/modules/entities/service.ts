@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import {
   businesses,
@@ -132,7 +132,7 @@ const getEntities = async (
     );
   }
 
-  return db
+  const rows = await db
     .select({
       id: entities.id,
       businessId: entities.businessId,
@@ -141,23 +141,38 @@ const getEntities = async (
       address: entities.address,
       category: entities.category,
       totalAmount: sql<number>`${entities.totalAmount}::float8`,
-      unpaidAmount: sql<number>`COALESCE((
-        SELECT SUM(
-          CASE
-            WHEN ${entityTransactions.paymentStatus} = 'unpaid' THEN ${entityTransactions.amount}
-            WHEN ${entityTransactions.paymentStatus} = 'partial' THEN -${entityTransactions.amount}
-            ELSE 0
-          END
-        )
-        FROM ${entityTransactions}
-        WHERE ${entityTransactions.entityId} = ${entities.id}
-      ), 0)::float8`,
       reminderEnabled: entities.reminderEnabled,
       createdAt: entities.createdAt,
     })
     .from(entities)
     .where(and(...whereConditions))
     .orderBy(desc(entities.totalAmount), desc(entities.createdAt));
+
+  if (rows.length === 0) return [];
+
+  const transactionTotals = await db
+    .select({
+      entityId: entityTransactions.entityId,
+      unpaidAmount: sql<number>`SUM(
+        CASE
+          WHEN ${entityTransactions.paymentStatus} = 'unpaid' THEN ${entityTransactions.amount}
+          WHEN ${entityTransactions.paymentStatus} = 'partial' THEN -${entityTransactions.amount}
+          ELSE 0
+        END
+      )::float8`,
+    })
+    .from(entityTransactions)
+    .where(inArray(entityTransactions.entityId, rows.map((row) => row.id)))
+    .groupBy(entityTransactions.entityId);
+
+  const unpaidAmountByEntity = new Map(
+    transactionTotals.map((row) => [row.entityId, row.unpaidAmount]),
+  );
+
+  return rows.map((row) => ({
+    ...row,
+    unpaidAmount: unpaidAmountByEntity.get(row.id) ?? 0,
+  }));
 };
 
 const getEntityById = async (authUser: AuthUserContext, entityId: string) => {

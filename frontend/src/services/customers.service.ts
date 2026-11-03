@@ -27,7 +27,7 @@ export async function fetchCustomers(categoryId: string): Promise<Customer[]> {
 }
 
 export async function settleCustomerPayment(customerId: string, totalAmount: number): Promise<void> {
-  await createPaymentTransaction(customerId, totalAmount);
+  await createPaymentTransaction(customerId, totalAmount, "partial");
 }
 
 export type PayCustomerResponse = {
