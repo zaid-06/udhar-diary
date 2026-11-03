@@ -18,7 +18,7 @@ export default function CustomersPage() {
       headerExtra={(customers) => {
         const totals = customers.reduce(
           (result, customer) => {
-            const amount = Number(customer.unpaidAmount || 0);
+            const amount = Number(customer.totalAmount || 0);
             if (amount < 0) result.toGive += Math.abs(amount);
             else result.toGet += amount;
             return result;

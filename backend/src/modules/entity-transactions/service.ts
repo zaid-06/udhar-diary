@@ -19,6 +19,16 @@ const getOwnedEntity = async (ownerId: number, entityId: string) => {
   return entity ?? null;
 };
 
+const getBalanceDelta = (
+  type: "credit" | "debit",
+  paymentStatus: "paid" | "unpaid" | "partial",
+  amount: number,
+) => {
+  if (paymentStatus === "unpaid") return amount;
+  if (paymentStatus === "partial" || type === "debit") return -amount;
+  return 0;
+};
+
 const createTransaction = async (
   authUser: AuthUserContext,
   input: CreateEntityTransactionInput,
@@ -28,11 +38,9 @@ const createTransaction = async (
   if (!entity) return { status: "entity_not_found" as const };
 
   const paymentStatus = input.paymentStatus ?? (input.type === "debit" ? "paid" : "unpaid");
-  const delta = input.type === "credit"
-    ? paymentStatus === "paid" ? 0 : input.amount
-    : -input.amount;
+  const delta = getBalanceDelta(input.type, paymentStatus, input.amount);
   const nextTotal = entity.totalAmount + delta;
-  const isPartialPayment = input.type === "debit" && paymentStatus === "partial";
+  const isPartialPayment = paymentStatus === "partial";
   if (nextTotal < 0 && !isPartialPayment) {
     return {
       status: "insufficient_balance" as const,
@@ -138,9 +146,7 @@ const deleteTransaction = async (
     await tx
       .delete(entityTransactions)
       .where(eq(entityTransactions.id, transactionId));
-    const reverseDelta = row.type === "credit"
-      ? row.paymentStatus === "paid" ? 0 : -row.amount
-      : row.amount;
+    const reverseDelta = -getBalanceDelta(row.type, row.paymentStatus, row.amount);
     await tx
       .update(entities)
       .set({
