@@ -342,6 +342,24 @@ export const customerConfig: EntityConfig<Customer, CustomerDetails> = {
   },
   details: {
     title: () => "Customer Details",
+    headerExtra: (item) => {
+      const amount = Number(item.totalAmount || 0);
+      const toGive = amount < 0 ? Math.abs(amount) : 0;
+      const toGet = amount > 0 ? amount : 0;
+
+      return (
+        <div className="flex items-start gap-3 text-right">
+          <div>
+            <p className="text-[10px] font-medium leading-tight text-primary-foreground/80">You Will Give</p>
+            <p className="text-sm font-semibold leading-tight text-rose-300">{formatInr(toGive)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] font-medium leading-tight text-primary-foreground/80">You Will Get</p>
+            <p className="text-sm font-semibold leading-tight text-emerald-300">{formatInr(toGet)}</p>
+          </div>
+        </div>
+      );
+    },
     logsPosition: "bottom",
     loadDetails: async (item) => ({
       transactions: await fetchTransactionsByParty(item.id),

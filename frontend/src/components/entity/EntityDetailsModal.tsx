@@ -33,19 +33,23 @@ export function EntityDetailsModal<TItem, TDetails>({
       <DialogContent className="flex h-[90vh] max-w-[calc(100%-1rem)] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-4xl">
         {item ? (
           <>
-            <div className="sticky top-0 z-10 border-b bg-card/95 px-4 py-3 backdrop-blur">
+            <div className="sticky top-0 z-10 border-b border-primary/20 bg-primary px-4 py-3 text-primary-foreground">
               <div className="space-y-1">
                 <div className="flex items-center justify-between gap-3">
-                  <DialogTitle>{config.title(item)}</DialogTitle>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Close details"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    <X className="size-4" />
-                  </Button>
+                  <DialogTitle className="min-w-0 text-primary-foreground">{config.title(item)}</DialogTitle>
+                  <div className="ml-auto flex shrink-0 items-center gap-3">
+                    {config.headerExtra?.(item)}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+                      aria-label="Close details"
+                      onClick={() => onOpenChange(false)}
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
                 </div>
                 {config.subtitle ? (
                   <DialogDescription>{config.subtitle(item)}</DialogDescription>

@@ -70,7 +70,13 @@ export function EntityPage<TItem, TDetails>({
     setListLoading(true);
     try {
       const data = await config.list(context);
-      if (requestId === listRequestId.current) setRows(data);
+      if (requestId === listRequestId.current) {
+        setRows(data);
+        setSelected((current) => {
+          if (!current) return current;
+          return data.find((row) => config.getRowId(row) === config.getRowId(current)) ?? current;
+        });
+      }
     } finally {
       if (requestId === listRequestId.current) {
         setListBusinessId(activeBusinessId);

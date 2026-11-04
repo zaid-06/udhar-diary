@@ -32,6 +32,7 @@ export type EntityPageContext = {
 export type EntityDetailsConfig<TItem, TDetails> = {
   title: (item: TItem) => string;
   subtitle?: (item: TItem) => string;
+  headerExtra?: (item: TItem) => ReactNode;
   loadDetails?: (item: TItem) => Promise<TDetails | null>;
   logsPosition?: "middle" | "bottom";
   renderSummary: (item: TItem, details: TDetails | null) => ReactNode;
